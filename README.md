@@ -17,16 +17,22 @@ Two variants live in this repo:
 ## How it works
 
 ```
-push resume-awesome.tex ──► CI compiles with XeLaTeX ──► resume-awesome.pdf
-                                                                  │
-                                            ┌─────────────────────┴─────────────────────┐
-                                            ▼                                           ▼
-                                 GitHub Release "latest"                     static/files/Resume.pdf
-                                  (stable download URL)                       in punitpi/typedbyme
-                                                                                        │
-                                                                                        ▼
-                                                                         typedbyme's own Pages workflow
-                                                                         rebuilds and redeploys the site
+                push resume-awesome.tex
+                          │
+                          ▼
+                CI compiles with XeLaTeX
+                          │
+                          ▼
+                 resume-awesome.pdf
+                          │
+            ┌─────────────┴─────────────┐
+            ▼                           ▼
+  GitHub Release "latest"    static/files/Resume.pdf
+  (stable download URL)       in punitpi/typedbyme
+                                          │
+                                          ▼
+                           typedbyme's own Pages workflow
+                           rebuilds and redeploys the site
 ```
 
 The portfolio sync pushes with a Personal Access Token rather than the default `GITHUB_TOKEN`,
