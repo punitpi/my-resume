@@ -15,11 +15,16 @@
 %==============================================================================
 \documentclass[11pt, a4paper]{awesome-cv}
 
-\geometry{left=1.3cm, top=1.0cm, right=1.3cm, bottom=1.3cm, footskip=.4cm}
+\geometry{left=1.1cm, top=0.7cm, right=1.1cm, bottom=0.9cm, footskip=.35cm}
 
 \colorlet{awesome}{awesome-skyblue}
 \setbool{acvSectionColorHighlight}{true}
 \renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
+
+% Tightened from the class defaults (3mm / 2.5mm) to fit one page after
+% adding the photo and four experience entries.
+\renewcommand{\acvSectionTopSkip}{1.6mm}
+\renewcommand{\acvSectionContentTopSkip}{1.2mm}
 
 %-------------------------------------------------------------------------------
 % PERSONAL INFORMATION
@@ -162,17 +167,6 @@ designing APIs and infrastructure that scale.
     {
       \begin{cvitems}
         \item {Lightweight proxy for Spotify's Currently Playing API with automatic OAuth token refresh.}
-      \end{cvitems}
-    }
-
-  \cventry
-    {TypedByMe Portfolio}
-    {Hugo, GitHub Actions}
-    {}
-    {2024 -- Present}
-    {
-      \begin{cvitems}
-        \item {Personal portfolio and technical blog with automated static-site builds and continuous deployment.}
       \end{cvitems}
     }
 
