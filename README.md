@@ -1,26 +1,32 @@
 # my-resume
 
 [![Build and Sync Resume](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml/badge.svg)](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml)
-[![Download PDF](https://img.shields.io/badge/download-resume.pdf-blue)](https://github.com/punitpi/my-resume/releases/latest/download/resume.pdf)
+[![Download PDF](https://img.shields.io/badge/download-resume--awesome.pdf-blue)](https://github.com/punitpi/my-resume/releases/latest/download/resume-awesome.pdf)
 
 ATS-friendly LaTeX resume, single source of truth for [typedbyme.puneeth.io](https://typedbyme.puneeth.io).
-Every push to `resume.tex` on `main` is compiled with XeLaTeX, published as a workflow artifact
-and as a rolling GitHub Release (tag `latest`), and copied into the portfolio repository so the
-live site's resume link always serves the current PDF.
+
+Two variants live in this repo:
+- **`resume-awesome.tex`** — the primary resume (Awesome-CV template, with photo). Every push on
+  `main` is compiled with XeLaTeX, published as a workflow artifact and as a rolling GitHub
+  Release (tag `latest`), and copied into the portfolio repository so the live site's resume link
+  always serves the current PDF.
+- **`resume.tex`** — the original single-column template, kept in the repo as a backup. Stable and
+  not actively changing, so it is **not** built automatically on push (see "Local development"
+  below to build it, or run the workflow manually with `root_file: resume.tex`).
 
 ## How it works
 
 ```
-push resume.tex ──► CI compiles with XeLaTeX ──► resume.pdf
-                                                      │
-                          ┌───────────────────────────┼───────────────────────────┐
-                          ▼                            ▼
-              GitHub Release "latest"        static/files/Resume.pdf
-              (stable download URL)          in punitpi/typedbyme
-                                                        │
-                                                        ▼
-                                          typedbyme's own Pages workflow
-                                          rebuilds and redeploys the site
+push resume-awesome.tex ──► CI compiles with XeLaTeX ──► resume-awesome.pdf
+                                                               │
+                                   ┌───────────────────────────┼───────────────────────────┐
+                                   ▼                            ▼
+                       GitHub Release "latest"        static/files/Resume.pdf
+                       (stable download URL)          in punitpi/typedbyme
+                                                                 │
+                                                                 ▼
+                                                   typedbyme's own Pages workflow
+                                                   rebuilds and redeploys the site
 ```
 
 The portfolio sync pushes with a Personal Access Token rather than the default `GITHUB_TOKEN`,
@@ -46,11 +52,12 @@ xelatex --version
 ### 2. Build the PDF
 
 ```bash
-latexmk -xelatex resume.tex
+latexmk -xelatex resume-awesome.tex   # primary resume
+latexmk -xelatex resume.tex           # backup, classic template
 ```
 
-This produces `resume.pdf` and leaves auxiliary files (`.aux`, `.log`, etc.) alongside it — all
-git-ignored. To clean them up:
+This produces `resume-awesome.pdf` / `resume.pdf` and leaves auxiliary files (`.aux`, `.log`,
+etc.) alongside them — all git-ignored. To clean them up:
 
 ```bash
 latexmk -c
@@ -105,14 +112,15 @@ built PDF into the portfolio repo:
    New repository secret**:
    - **Name:** `PORTFOLIO_PAT`
    - **Value:** the token from step 2
-4. Push a change to `resume.tex` (or run the workflow manually via **Actions → Build and Sync
-   Resume → Run workflow**) to verify the sync end-to-end.
+4. Push a change to `resume-awesome.tex` (or run the workflow manually via **Actions → Build and
+   Sync Resume → Run workflow**) to verify the sync end-to-end.
 
 ## Outputs
 
 | Artifact | Location |
 |---|---|
-| Workflow artifact (per run) | Actions run summary → Artifacts → `resume-pdf` |
+| Workflow artifact (per run) | Actions run summary → Artifacts → `resume-awesome-pdf` |
 | Rolling release | [Releases → `latest`](https://github.com/punitpi/my-resume/releases/tag/latest) |
-| Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/resume.pdf` |
+| Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/resume-awesome.pdf` |
 | Live portfolio copy | `static/files/Resume.pdf` in [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme) |
+| Backup template | `resume.tex` — build locally, not built by CI |

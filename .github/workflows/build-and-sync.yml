@@ -4,7 +4,6 @@ on:
   push:
     branches: [main]
     paths:
-      - 'resume.tex'
       - 'resume-awesome.tex'
       - 'awesome-cv.cls'
       - 'fonts/**'
@@ -21,11 +20,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Experimental Awesome-CV variant. Runs as its own job so a failure here
-  # (expected on early iterations - see resume-awesome.tex header comment)
-  # never blocks the release or portfolio sync below, which stay on the
-  # working resume.tex build until this one is verified.
-  build-awesome-experimental:
+  # Primary resume. Builds, publishes the rolling release, and syncs into
+  # the portfolio repo.
+  #
+  # resume.tex (the original single-column template) is kept in the repo
+  # as a backup but is NOT built automatically - it's stable and not
+  # changing, so it doesn't need CI time on every push. To rebuild it:
+  #   latexmk -xelatex resume.tex   (needs a local TeX install)
+  # or add 'root_file: resume.tex' to a manual run of this workflow.
+  build-and-sync:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout resume repo
@@ -44,34 +47,15 @@ jobs:
           path: resume-awesome.pdf
           if-no-files-found: error
 
-  build-and-sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout resume repo
-        uses: actions/checkout@v7
-
-      - name: Compile resume.tex with XeLaTeX
-        uses: xu-cheng/latex-action@v4
-        with:
-          root_file: resume.tex
-          latexmk_use_xelatex: true
-
-      - name: Upload PDF as workflow artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: resume-pdf
-          path: resume.pdf
-          if-no-files-found: error
-
       - name: Publish rolling GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           tag_name: latest
           name: "Latest Resume"
-          body: "Automatically built from ${{ github.sha }}. Always reflects the current resume.tex."
+          body: "Automatically built from ${{ github.sha }}. Always reflects the current resume-awesome.tex."
           prerelease: false
           make_latest: true
-          files: resume.pdf
+          files: resume-awesome.pdf
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -91,7 +75,7 @@ jobs:
           # (capital R). A lowercase copy creates a second, unreferenced file
           # on a case-sensitive filesystem and leaves the site serving the
           # stale PDF. Do not normalize the case.
-          cp resume.pdf portfolio-repo/static/files/Resume.pdf
+          cp resume-awesome.pdf portfolio-repo/static/files/Resume.pdf
 
           cd portfolio-repo
           git config user.name "github-actions[bot]"
