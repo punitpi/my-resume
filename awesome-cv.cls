@@ -88,12 +88,15 @@
 % Needed to use icons from font-awesome
 \RequirePackage{fontawesome6}
 \RequirePackage{accsupp}
+% Renderer=HarfBuzz disabled: suspected cause of a text-extraction bug
+% where the letter 'i' and social-link ActualText were dropped from the
+% PDF text layer despite rendering correctly on the page.
 \defaultfontfeatures{
-  Renderer=HarfBuzz,
+%  Renderer=HarfBuzz,
 }
 \setmainfont{SourceSans3}[
   Path=./fonts/,
-  Extension=.ttf,
+  Extension=.otf,
   UprightFont=*-Regular,
   ItalicFont=*-It,
   BoldFont=*-Bold,
@@ -103,7 +106,7 @@
 ]
 \setsansfont{SourceSans3}[
   Path=./fonts/,
-  Extension=.ttf,
+  Extension=.otf,
   UprightFont=*-Regular,
   ItalicFont=*-It,
   BoldFont=*-Bold,
@@ -113,7 +116,7 @@
 ]
 \newfontfamily\roboto{SourceSans3}[
   Path=./fonts/,
-  Extension=.ttf,
+  Extension=.otf,
   UprightFont=*-Regular,
   ItalicFont=*-It,
   BoldFont=*-Bold,
