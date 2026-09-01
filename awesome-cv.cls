@@ -519,6 +519,17 @@
   \EndAccSupp{}%
 }
 
+% Local addition: FontAwesome6Brands glyphs (faSquareGithub, faLinkedin,
+% etc.) have no ToUnicode/cmap entry, and accsupp's ActualText does not
+% reliably attach to them via XeLaTeX's PDF backend - confirmed by testing
+% (Free-Solid icons like faHouseChimney extract fine via \faAlt; Brands
+% icons do not, even with HarfBuzz disabled). \faAltVisible renders the
+% username as always-visible plain text after the icon instead of relying
+% on ActualText, so it is never dropped from the PDF text layer.
+\newcommand{\faAltVisible}[3]{%
+  \mbox{#2\acvHeaderIconSep#3}%
+}
+
 %-------------------------------------------------------------------------------
 %                Commands for elements of CV structure
 %-------------------------------------------------------------------------------
@@ -594,7 +605,7 @@
         {}%
         {%
           \ifbool{isstart}{\setbool{isstart}{false}}{\acvHeaderSocialSep}%
-          \href{https://github.com/\@github}{\faAlt{GitHub: @\@github}{\faSquareGithub}{\@github}}%
+          \href{https://github.com/\@github}{\faAltVisible{GitHub: @\@github}{\faSquareGithub}{\@github}}%
         }%
       \ifthenelse{\isundefined{\@gitlab}}%
         {}%
@@ -618,7 +629,7 @@
         {}%
         {%
           \ifbool{isstart}{\setbool{isstart}{false}}{\acvHeaderSocialSep}%
-          \href{https://www.linkedin.com/in/\@linkedin}{\faAlt{LinkedIn: /in/\@linkedin}{\faLinkedin}{\@linkedin}}%
+          \href{https://www.linkedin.com/in/\@linkedin}{\faAltVisible{LinkedIn: /in/\@linkedin}{\faLinkedin}{\@linkedin}}%
         }%
       \ifthenelse{\isundefined{\@orcid}}%
         {}%
