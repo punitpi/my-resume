@@ -8,6 +8,7 @@ on:
       - 'resume-awesome.tex'
       - 'awesome-cv.cls'
       - 'fonts/**'
+      - 'images/**'
       - '**/*.cls'
       - '.github/workflows/build-and-sync.yml'
   workflow_dispatch:
