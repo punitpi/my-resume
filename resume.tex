@@ -1,0 +1,138 @@
+%==============================================================================
+% Puneeth Prakash - Resume
+% Engine: XeLaTeX (required - fontspec)
+% Build:  latexmk -xelatex resume.tex
+%
+% ATS notes: single column, no tables/tikz/images, plain-text headings,
+% selectable hyperlinks. Do not introduce multi-column layout or graphics -
+% applicant tracking systems extract text linearly and will scramble it.
+%
+% Font: intentionally NO \setmainfont. XeLaTeX falls back to Latin Modern,
+% which is always present and needs no fontconfig lookup. Naming a family
+% (even TeX Gyre) can fail in the CI container's Alpine image.
+%==============================================================================
+\documentclass[a4paper,10pt]{article}
+
+\usepackage{fontspec}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\hypersetup{
+  pdftitle={Puneeth Prakash - Resume},
+  pdfauthor={Puneeth Prakash},
+  pdfsubject={DevSecOps Engineer / Software Engineer},
+  pdfcreator={XeLaTeX}
+}
+
+% Suppress page numbering - single page document
+\pagestyle{empty}
+
+% Section headings: plain uppercase text with a horizontal rule beneath
+\titleformat{\section}
+  {\large\bfseries\scshape}
+  {}{0em}
+  {}[\vspace{-0.55em}\rule{\textwidth}{0.6pt}]
+\titlespacing*{\section}{0pt}{0.9em}{0.5em}
+
+% Tight bullet lists
+\setlist[itemize]{
+  leftmargin=1.2em,
+  itemsep=0.12em,
+  parsep=0pt,
+  topsep=0.25em,
+  partopsep=0pt
+}
+
+% Experience entry: {Role}{Dates}{Company}{Location}
+\newcommand{\role}[4]{%
+  \vspace{0.35em}%
+  \noindent\textbf{#1}\hfill\textbf{#2}\par
+  \noindent\textit{#3}\hfill\textit{#4}\par
+  \vspace{-0.2em}%
+}
+
+% Project entry: {Name}{Tech}{Description}
+\newcommand{\project}[3]{%
+  \item \textbf{#1} \textbar{} \textit{#2} --- #3
+}
+
+\begin{document}
+
+%------------------------------------------------------------------ HEADER
+\begin{center}
+  {\Huge\bfseries Puneeth Prakash}\\[0.45em]
+  {\large DevSecOps Engineer \textbar{} Software Engineer}\\[0.5em]
+  Bregenz, Vorarlberg, Austria \textbullet{}
+  \href{mailto:contact@puneeth.io}{contact@puneeth.io} \textbullet{}
+  \href{https://linkedin.com/in/ppuneeth}{linkedin.com/in/ppuneeth} \textbullet{}
+  \href{https://github.com/punitpi}{github.com/punitpi} \textbullet{}
+  \href{https://typedbyme.puneeth.io}{typedbyme.puneeth.io}
+\end{center}
+
+%------------------------------------------------------------------ SUMMARY
+\section{Summary}
+Software engineer with 8+ years of experience across DevSecOps, cloud-native architecture,
+and microservices. Currently building secure, observable engineering systems at OMICRON
+electronics. Works across C\#, Node.js, AWS, and Azure --- automating CI/CD workflows,
+hardening pipelines, and designing APIs and infrastructure that scale.
+
+%------------------------------------------------------------------ SKILLS
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0em,label={}]
+  \item \textbf{Languages:} C\#, JavaScript (Node.js), Python, Bash, SQL, YAML
+  \item \textbf{Cloud \& IaC:} AWS (EKS, Lambda, Fargate ECS, API Gateway, S3, DynamoDB), Azure (AKS, WebJobs), Terraform, CloudFormation
+  \item \textbf{DevSecOps \& CI/CD:} GitHub Actions, Jenkins, Harness, Ansible, SonarQube, Black Duck, Docker, Kubernetes, Helm
+  \item \textbf{Backend \& Data:} .NET, Express, Flask, React, Keycloak (OAuth2), Microsoft Graph API, MSSQL, MySQL, MongoDB, Redis
+\end{itemize}
+
+%------------------------------------------------------------------ EXPERIENCE
+\section{Experience}
+
+\role{DevSecOps Engineer / Software Engineer}{Dec 2025 -- Present}{OMICRON electronics}{Klaus, Austria}
+\begin{itemize}
+  \item Designed and deployed a full observability platform on Azure Kubernetes Service (AKS) using the LGTM stack (Loki, Grafana, Tempo, Mimir).
+  \item Built Azure infrastructure from scratch with Terraform, establishing reproducible environment provisioning.
+  \item Packaged observability components into a custom umbrella Helm chart for repeatable, versioned deployments.
+  \item Apply DevSecOps practices across cloud infrastructure security and CI/CD pipeline hardening.
+\end{itemize}
+
+\role{Senior Software Engineer}{Feb 2021 -- Oct 2025}{OneAdvanced}{Bengaluru, India}
+\begin{itemize}
+  \item Architected cloud-native microservices using Node.js, AWS Lambda, and Kubernetes (EKS), deploying and maintaining production clusters.
+  \item Built a secure middleware microservice on AWS Fargate ECS with OAuth2 authentication via Keycloak.
+  \item Implemented end-to-end CI/CD pipelines using GitHub Actions, Harness, CloudFormation, and Terraform.
+  \item Designed reusable .NET Worker Services for event-driven operations and Azure WebJobs for Microsoft webhook integration.
+  \item Resolved penetration-testing vulnerabilities and drove \$1,000+ monthly AWS cost savings through resource optimization.
+\end{itemize}
+
+\role{Software Engineer}{Mar 2018 -- Feb 2021}{OneAdvanced}{Bengaluru, India}
+\begin{itemize}
+  \item Built a serverless customer portal on AWS Lambda, API Gateway, and S3, contributing React front-end components.
+  \item Optimized SQL stored procedures for a 50\% improvement in query performance; automated deployments via Jenkins CI/CD pipelines.
+\end{itemize}
+
+\role{Test Engineer}{Mar 2017 -- Nov 2017}{Samsung R\&D Institute India}{Bengaluru, India}
+\begin{itemize}
+  \item Authored and executed 600+ test cases for Project Bixby; managed test server deployments and analyzed Android crash reports via ADB/DDMS.
+\end{itemize}
+
+%------------------------------------------------------------------ PROJECTS
+\section{Projects}
+\begin{itemize}
+  \project{LGTM Observability Stack}{AKS, Terraform, Helm}{Production-grade observability platform on Azure Kubernetes Service, provisioned with Terraform and deployed via a custom umbrella Helm chart.}
+  \project{Homelab Infrastructure}{Raspberry Pi, Traefik, Authentik, Tailscale}{Infrastructure-as-code homelab with SSO, reverse proxy, mesh networking, and automated Restic backups.}
+  \project{Spotify Now Playing API}{Cloudflare Workers, OAuth2}{Lightweight proxy for Spotify's Currently Playing API with automatic OAuth token refresh.}
+  \project{TypedByMe Portfolio}{Hugo, GitHub Actions}{Personal portfolio and technical blog with automated static-site builds and continuous deployment.}
+\end{itemize}
+
+%------------------------------------------------------------------ EDUCATION
+\section{Education \& Certification}
+\role{B.E., Computer Science and Engineering}{2013 -- 2017}{Visvesvaraya Technological University}{India}
+\vspace{0.5em}
+\begin{itemize}[leftmargin=0em,label={}]
+  \item \textbf{AWS Certified Solutions Architect -- Associate} (2023)
+\end{itemize}
+
+\end{document}

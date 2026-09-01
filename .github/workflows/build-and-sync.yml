@@ -1,0 +1,87 @@
+name: Build and Sync Resume
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'resume.tex'
+      - '**/*.cls'
+      - '.github/workflows/build-and-sync.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "resume-build"
+  cancel-in-progress: true
+
+jobs:
+  build-and-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout resume repo
+        uses: actions/checkout@v7
+
+      - name: Compile resume.tex with XeLaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: resume.tex
+          latexmk_use_xelatex: true
+
+      - name: Upload PDF as workflow artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: resume-pdf
+          path: resume.pdf
+          if-no-files-found: error
+
+      - name: Publish rolling GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: "Latest Resume"
+          body: "Automatically built from ${{ github.sha }}. Always reflects the current resume.tex."
+          prerelease: false
+          make_latest: true
+          files: resume.pdf
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone portfolio repository
+        env:
+          PORTFOLIO_PAT: ${{ secrets.PORTFOLIO_PAT }}
+        run: |
+          git clone "https://x-access-token:${PORTFOLIO_PAT}@github.com/punitpi/typedbyme.git" portfolio-repo
+
+      - name: Sync PDF into portfolio and push if changed
+        env:
+          PORTFOLIO_PAT: ${{ secrets.PORTFOLIO_PAT }}
+        run: |
+          set -euo pipefail
+
+          # Filename case matters: the live site links static/files/Resume.pdf
+          # (capital R). A lowercase copy creates a second, unreferenced file
+          # on a case-sensitive filesystem and leaves the site serving the
+          # stale PDF. Do not normalize the case.
+          cp resume.pdf portfolio-repo/static/files/Resume.pdf
+
+          cd portfolio-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add static/files/Resume.pdf
+
+          # Guard on a real diff - an unchanged PDF must not fail the step
+          # on an empty commit.
+          if git diff --cached --quiet; then
+            echo "Resume PDF unchanged - nothing to sync."
+            exit 0
+          fi
+
+          git commit -m "chore: sync resume PDF from my-resume@${GITHUB_SHA}"
+
+          # Intentionally no [skip ci]: this push must trigger the
+          # portfolio's own Pages deploy workflow. A push authenticated with
+          # a PAT (unlike the default GITHUB_TOKEN) does trigger downstream
+          # workflows, which is what makes this chain reach the live site.
+          git push "https://x-access-token:${PORTFOLIO_PAT}@github.com/punitpi/typedbyme.git" HEAD:main
