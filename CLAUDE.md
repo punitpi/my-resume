@@ -53,6 +53,13 @@ time when possible.
 - ATS verification that actually matters: `pdftotext -raw file.pdf - | grep -oE 'punitpi|ppuneeth'`
   (or other identifying strings) — a clean visual render does not prove the text layer is intact.
 
+## CI trigger scope
+
+`awesome-cv.cls` is in the path filter (`**/*.cls`), so *any* edit to it — including a
+comment-only change — triggers a full rebuild + release + portfolio sync. `resume.tex`, README,
+and other non-listed files do not. This is intentional (a missed real change is worse than an
+occasional harmless rebuild), but worth knowing before assuming a `.cls` comment tweak is free.
+
 ## GitHub Actions
 
 - `xu-cheng/latex-action@v4`, `latexmk_use_xelatex: true`. Alpine-based image by default, no
