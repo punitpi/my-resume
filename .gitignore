@@ -13,6 +13,9 @@
 # The built PDF is distributed via GitHub Releases and the portfolio sync,
 # not committed here - committing it would create merge noise on every edit.
 resume.pdf
+resume-awesome.pdf
+*.bcf
+*.run.xml
 
 # macOS
 .DS_Store

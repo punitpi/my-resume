@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - 'resume.tex'
+      - 'resume-awesome.tex'
+      - 'awesome-cv.cls'
+      - 'fonts/**'
       - '**/*.cls'
       - '.github/workflows/build-and-sync.yml'
   workflow_dispatch:
@@ -17,6 +20,29 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Experimental Awesome-CV variant. Runs as its own job so a failure here
+  # (expected on early iterations - see resume-awesome.tex header comment)
+  # never blocks the release or portfolio sync below, which stay on the
+  # working resume.tex build until this one is verified.
+  build-awesome-experimental:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout resume repo
+        uses: actions/checkout@v7
+
+      - name: Compile resume-awesome.tex with XeLaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: resume-awesome.tex
+          latexmk_use_xelatex: true
+
+      - name: Upload PDF as workflow artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: resume-awesome-pdf
+          path: resume-awesome.pdf
+          if-no-files-found: error
+
   build-and-sync:
     runs-on: ubuntu-latest
     steps:

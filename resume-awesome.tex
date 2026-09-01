@@ -1,0 +1,203 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+%==============================================================================
+% Puneeth Prakash - Resume (Awesome-CV variant)
+% Engine: XeLaTeX (required - fontspec)
+% Build:  latexmk -xelatex resume-awesome.tex
+%
+% Class: awesome-cv.cls (vendored from posquit0/Awesome-CV, LPPL
+% v1.3c, with local font-declaration modifications - see the header comment
+% in that file for what changed and why).
+%
+% Fonts: fonts/*.ttf (Source Sans 3, SIL OFL 1.1, see
+% fonts/LICENSE-SourceSans3.txt). Referenced by explicit file path, not by
+% family name, so no fontconfig lookup is required in the CI container.
+%==============================================================================
+\documentclass[11pt, a4paper]{awesome-cv}
+
+\geometry{left=1.3cm, top=1.0cm, right=1.3cm, bottom=1.3cm, footskip=.4cm}
+
+\colorlet{awesome}{awesome-skyblue}
+\setbool{acvSectionColorHighlight}{true}
+\renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
+
+%-------------------------------------------------------------------------------
+% PERSONAL INFORMATION
+%-------------------------------------------------------------------------------
+\name{Puneeth}{Prakash}
+\position{DevSecOps Engineer{\enskip\cdotp\enskip}Software Engineer}
+\address{Bregenz, Vorarlberg, Austria}
+
+\email{contact@puneeth.io}
+\homepage{typedbyme.puneeth.io}
+\github{punitpi}
+\linkedin{ppuneeth}
+
+%-------------------------------------------------------------------------------
+\begin{document}
+
+\makecvheader[C]
+
+\makecvfooter
+  {\today}
+  {Puneeth Prakash~~~\textperiodcentered~~~R\'esum\'e}
+  {\thepage}
+
+%-------------------------------------------------------------------------------
+% SUMMARY
+%-------------------------------------------------------------------------------
+\cvsection{Summary}
+\begin{cvparagraph}
+Software engineer with 8+ years of experience across DevSecOps, cloud-native architecture, and
+microservices. Currently building secure, observable engineering systems at OMICRON electronics.
+Works across C\#, Node.js, AWS, and Azure --- automating CI/CD workflows, hardening pipelines, and
+designing APIs and infrastructure that scale.
+\end{cvparagraph}
+
+%-------------------------------------------------------------------------------
+% SKILLS
+%-------------------------------------------------------------------------------
+\cvsection{Technical Skills}
+\begin{cvskills}
+  \cvskill{Languages}{C\#, JavaScript (Node.js), Python, Bash, SQL, YAML}
+  \cvskill{Cloud \& IaC}{AWS (EKS, Lambda, Fargate ECS, API Gateway, S3, DynamoDB), Azure (AKS, WebJobs), Terraform, CloudFormation}
+  \cvskill{DevSecOps \& CI/CD}{GitHub Actions, Jenkins, Harness, Ansible, SonarQube, Black Duck, Docker, Kubernetes, Helm}
+  \cvskill{Backend \& Data}{.NET, Express, Flask, React, Keycloak (OAuth2), Microsoft Graph API, MSSQL, MySQL, MongoDB, Redis}
+\end{cvskills}
+
+%-------------------------------------------------------------------------------
+% EXPERIENCE
+%-------------------------------------------------------------------------------
+\cvsection{Experience}
+\begin{cventries}
+
+  \cventry
+    {DevSecOps Engineer / Software Engineer}
+    {OMICRON electronics}
+    {Klaus, Austria}
+    {Dec 2025 -- Present}
+    {
+      \begin{cvitems}
+        \item {Designed and deployed a full observability platform on Azure Kubernetes Service (AKS) using the LGTM stack (Loki, Grafana, Tempo, Mimir).}
+        \item {Built Azure infrastructure from scratch with Terraform, establishing reproducible environment provisioning.}
+        \item {Packaged observability components into a custom umbrella Helm chart for repeatable, versioned deployments.}
+        \item {Apply DevSecOps practices across cloud infrastructure security and CI/CD pipeline hardening.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Senior Software Engineer}
+    {OneAdvanced}
+    {Bengaluru, India}
+    {Feb 2021 -- Oct 2025}
+    {
+      \begin{cvitems}
+        \item {Architected cloud-native microservices using Node.js, AWS Lambda, and Kubernetes (EKS), deploying and maintaining production clusters.}
+        \item {Built a secure middleware microservice on AWS Fargate ECS with OAuth2 authentication via Keycloak.}
+        \item {Implemented end-to-end CI/CD pipelines using GitHub Actions, Harness, CloudFormation, and Terraform; designed reusable .NET Worker Services and Azure WebJobs for event-driven integrations.}
+        \item {Resolved penetration-testing vulnerabilities and drove \$1,000+ monthly AWS cost savings through resource optimization.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Software Engineer}
+    {OneAdvanced}
+    {Bengaluru, India}
+    {Mar 2018 -- Feb 2021}
+    {
+      \begin{cvitems}
+        \item {Built a serverless customer portal on AWS Lambda, API Gateway, and S3, contributing React front-end components.}
+        \item {Optimized SQL stored procedures for a 50\% improvement in query performance; automated deployments via Jenkins CI/CD pipelines.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Test Engineer}
+    {Samsung R\&D Institute India}
+    {Bengaluru, India}
+    {Mar 2017 -- Nov 2017}
+    {
+      \begin{cvitems}
+        \item {Authored and executed 600+ test cases for Project Bixby; managed test server deployments and analyzed Android crash reports via ADB/DDMS.}
+      \end{cvitems}
+    }
+
+\end{cventries}
+
+%-------------------------------------------------------------------------------
+% PROJECTS
+%-------------------------------------------------------------------------------
+\cvsection{Projects}
+\begin{cventries}
+
+  \cventry
+    {LGTM Observability Stack}
+    {AKS, Terraform, Helm}
+    {}
+    {2025}
+    {
+      \begin{cvitems}
+        \item {Production-grade observability platform on Azure Kubernetes Service, provisioned with Terraform and deployed via a custom umbrella Helm chart.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Homelab Infrastructure}
+    {Raspberry Pi, Traefik, Authentik, Tailscale}
+    {}
+    {2024 -- Present}
+    {
+      \begin{cvitems}
+        \item {Infrastructure-as-code homelab with SSO, reverse proxy, mesh networking, and automated Restic backups.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Spotify Now Playing API}
+    {Cloudflare Workers, OAuth2}
+    {}
+    {2024}
+    {
+      \begin{cvitems}
+        \item {Lightweight proxy for Spotify's Currently Playing API with automatic OAuth token refresh.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {TypedByMe Portfolio}
+    {Hugo, GitHub Actions}
+    {}
+    {2024 -- Present}
+    {
+      \begin{cvitems}
+        \item {Personal portfolio and technical blog with automated static-site builds and continuous deployment.}
+      \end{cvitems}
+    }
+
+\end{cventries}
+
+%-------------------------------------------------------------------------------
+% EDUCATION & CERTIFICATION
+%-------------------------------------------------------------------------------
+\cvsection{Education \& Certification}
+\begin{cventries}
+
+  \cventry
+    {B.E., Computer Science and Engineering}
+    {Visvesvaraya Technological University}
+    {India}
+    {2013 -- 2017}
+    {}
+
+\end{cventries}
+
+\begin{cvhonors}
+  \cvhonor
+    {AWS Certified Solutions Architect -- Associate}
+    {Amazon Web Services}
+    {}
+    {2023}
+\end{cvhonors}
+
+%-------------------------------------------------------------------------------
+\end{document}
