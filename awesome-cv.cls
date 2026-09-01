@@ -88,9 +88,11 @@
 % Needed to use icons from font-awesome
 \RequirePackage{fontawesome6}
 \RequirePackage{accsupp}
-% Renderer=HarfBuzz disabled: suspected cause of a text-extraction bug
-% where the letter 'i' and social-link ActualText were dropped from the
-% PDF text layer despite rendering correctly on the page.
+% Renderer=HarfBuzz was disabled while investigating a text-extraction bug
+% (small-caps 'i' and social-link ActualText missing from the PDF text
+% layer). It was NOT the cause - see \faAltVisible below for the actual
+% fix and root cause. Left disabled rather than re-enabling and re-testing
+% an unrelated change against an already-verified document.
 \defaultfontfeatures{
 %  Renderer=HarfBuzz,
 }
