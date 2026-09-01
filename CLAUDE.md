@@ -15,6 +15,14 @@ latexmk -c                            # clean aux files
 Full local setup (MacTeX/TeX Live, VS Code LaTeX Workshop) and GitHub Secrets configuration are
 in `README.md` — don't duplicate those steps here.
 
+## Skills
+
+- `verify-resume-build` — after any push to `.tex`/`.cls`, watches the CI run, downloads the
+  PDF, and checks page count / ATS text extraction / render. Use instead of re-deriving the
+  `gh run watch` → `gh run download` → `pdfinfo`/`pdftotext` sequence by hand.
+- `add-resume-entry` — adds a job/project/education entry with the correct `cventry` argument
+  order for that section (see the gotcha below). User-invoked only.
+
 ## Structure
 
 - `resume-awesome.tex` / `resume.tex` — the two resume sources (see below).
