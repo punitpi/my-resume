@@ -15,16 +15,24 @@
 %==============================================================================
 \documentclass[11pt, a4paper]{awesome-cv}
 
-\geometry{left=1.1cm, top=0.7cm, right=1.1cm, bottom=0.9cm, footskip=.35cm}
+\geometry{left=1.1cm, top=0.4cm, right=1.1cm, bottom=0.9cm, footskip=.35cm}
 
 \colorlet{awesome}{awesome-skyblue}
 \setbool{acvSectionColorHighlight}{true}
 \renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
 
 % Tightened from the class defaults (3mm / 2.5mm) to fit one page after
-% adding the photo and four experience entries.
+% adding the photo and four experience entries. Content-top-skip is paired
+% with a fixed -3mm/-2mm offset at each call site in the class, so going
+% much below ~2mm nets a negative space large enough to pull paragraph
+% text up into the section-title line above it - keep this at 2mm or more.
 \renewcommand{\acvSectionTopSkip}{1.6mm}
-\renewcommand{\acvSectionContentTopSkip}{1.2mm}
+\renewcommand{\acvSectionContentTopSkip}{2mm}
+
+% Header name is 32pt by default; the photo (1.3cm circle) plus that name
+% size leaves excess top whitespace. Trim both name lines by 1pt.
+\renewcommand*{\headerfirstnamestyle}[1]{{\fontsize{31pt}{1em}\headerfontlight\color{graytext} #1}}
+\renewcommand*{\headerlastnamestyle}[1]{{\fontsize{31pt}{1em}\headerfont\bfseries\color{text} #1}}
 
 %-------------------------------------------------------------------------------
 % PERSONAL INFORMATION
@@ -144,7 +152,7 @@ designing APIs and infrastructure that scale.
     {2025}
     {
       \begin{cvitems}
-        \item {Production-grade observability platform on Azure Kubernetes Service, provisioned with Terraform and deployed via a custom umbrella Helm chart.}
+        \item {Production-grade AKS observability platform provisioned with Terraform and a custom umbrella Helm chart.}
       \end{cvitems}
     }
 
