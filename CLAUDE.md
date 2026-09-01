@@ -4,6 +4,29 @@ LaTeX resume with CI-driven build, GitHub Release, and auto-sync to the portfoli
 (`punitpi/typedbyme`, `static/files/Resume.pdf`, capital R — case matters, the live site links
 that exact path).
 
+## Commands
+
+```bash
+latexmk -xelatex resume-awesome.tex   # primary resume (needs a local TeX install - see README)
+latexmk -xelatex resume.tex           # backup template
+latexmk -c                            # clean aux files
+```
+
+Full local setup (MacTeX/TeX Live, VS Code LaTeX Workshop) and GitHub Secrets configuration are
+in `README.md` — don't duplicate those steps here.
+
+## Structure
+
+- `resume-awesome.tex` / `resume.tex` — the two resume sources (see below).
+- `awesome-cv.cls` — vendored + locally patched Awesome-CV class (LPPL); `LICENCE-awesome-cv.txt`
+  is its license.
+- `fonts/` — vendored Source Sans 3 OTF weights (SIL OFL, `fonts/LICENSE-SourceSans3.txt`),
+  referenced by explicit path for `resume-awesome.tex`.
+- `images/` — profile photo used in the header.
+- `.github/workflows/build-and-sync.yml` — the only CI workflow; needs a `PORTFOLIO_PAT` repo
+  secret to reach the sync step (see README's "GitHub Actions / Secrets setup"). Without it, the
+  build/artifact/release steps still succeed — only the portfolio-sync step fails.
+
 ## Primary vs backup
 
 - **`resume-awesome.tex`** is the shipped resume. Every push to it (or `awesome-cv.cls`,
