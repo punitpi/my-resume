@@ -81,6 +81,16 @@ Invariants — do not break these:
   `PRIVATE_REPO_PAT`. This replaced an earlier `git clone`/`commit`/`push` approach that committed
   the PDF into `my-resume-private`'s tree — moved to a release so the link stays stable
   (`.../releases/latest/download/...`) instead of the repo accumulating one commit per change.
+- **The release asset's name is whatever the local file is named at upload time** —
+  `action-gh-release` cannot rename on upload. The public build's `Puneeth-Prakash-Resume.pdf`
+  is still sitting at the workspace root when the private release step runs (nothing deletes it
+  until final cleanup), so the private PDF is copied into its own `private-release/` subdirectory
+  under that same filename rather than renamed in place — renaming in place would silently
+  overwrite the public file on disk with the private one. Hit this exact bug once: the first
+  version of this step skipped the rename/isolation and the asset uploaded under the wrong name
+  (`Puneeth-Prakash-Resume-private.pdf`, the `-jobname` from the compile step), breaking the
+  stable download link before it was caught by actually downloading the asset, not just watching
+  the run go green.
 - Step order in the workflow matters: public compile and publish happen first (with no
   `private.tex` on disk), then the private compile, then `rm -f private.tex`, then the release
   publish. Two `if: always()` cleanup steps remove `private.tex` and the private PDF from the

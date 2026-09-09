@@ -145,6 +145,23 @@ jobs:
         if: always()
         run: rm -f private.tex
 
+      # -jobname above produced Puneeth-Prakash-Resume-private.pdf. The
+      # release asset name is exactly the local filename at upload time -
+      # action-gh-release does not support renaming - so to publish it as
+      # Puneeth-Prakash-Resume.pdf (matching the public download's name) the
+      # file has to actually be called that on disk.
+      #
+      # It's placed in its own subdirectory rather than renamed in place at
+      # the workspace root: the public build already put a file with that
+      # exact name there (still present - the portfolio-sync step reads it,
+      # nothing deletes it), so renaming in place would silently overwrite
+      # it. A separate directory means both files coexist with no collision,
+      # regardless of step order.
+      - name: Prepare private PDF for release
+        run: |
+          mkdir -p private-release
+          cp Puneeth-Prakash-Resume-private.pdf private-release/Puneeth-Prakash-Resume.pdf
+
       - name: Check PRIVATE_REPO_PAT is set
         run: |
           if [ -z "${PRIVATE_REPO_PAT}" ]; then
@@ -172,11 +189,11 @@ jobs:
           body: "Automatically built from punitpi/my-resume@${{ github.sha }}. Includes the phone number - do not share this link."
           prerelease: false
           make_latest: true
-          files: Puneeth-Prakash-Resume-private.pdf
+          files: private-release/Puneeth-Prakash-Resume.pdf
 
       # Belt and braces: the private PDF must not be left in the workspace for
       # any future step added below to publish by accident. Both cleanup steps
       # are if: always() so they run even when the compile or sync fails.
       - name: Remove private PDF from workspace
         if: always()
-        run: rm -f Puneeth-Prakash-Resume-private.pdf
+        run: rm -rf Puneeth-Prakash-Resume-private.pdf private-release
