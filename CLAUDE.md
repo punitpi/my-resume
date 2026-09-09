@@ -127,12 +127,12 @@ the live site. Then run `verify-resume-build` on the CI PDF.
   in the class. Setting it much below ~2mm nets a large enough negative space to pull paragraph
   text up into the section-title line above it (hit this with `cvparagraph`/Summary). Keep it at
   2mm or above when tightening for page-fit.
-- **`cvhonors`** (3-column: date | title | location) looks visually disconnected next to a
-  `cventries` table (2-column) in the *same* section. It is fine as its own section — that is how
-  "Certifications & Awards" is done. Its date column was **locally widened 1.5cm -> 2.6cm** (with
-  the middle column narrowed by the same amount so the three still sum to `\textwidth`) to fit a
-  date *range* like "2022 - 2025". Upstream's 1.5cm fits one year only: a range wraps to two
-  lines, and `\mbox`-ing it instead makes it overflow the column and collide with the title.
+- **`cvhonors` is not used in this document — use `cventries`.** `cvhonors` puts the date in a
+  fixed 1.5cm column on the *left*, which (a) fits one year only, so a range like "2022 - 2025"
+  wraps to two lines and knocks the row out of alignment (`\mbox` doesn't help: it then overflows
+  into the title), and (b) reads inconsistently beside Experience, Projects and Education, which
+  are all `cventries` with the date on the *right*. Certifications & Awards is a `cventries`
+  block for that reason: `#1` = credential, `#2` = issuer, `#4` = date range.
 - ATS verification that actually matters: `pdftotext -raw file.pdf - | grep -oE 'punitpi|ppuneeth|cert-manager'`
   — a clean visual render does not prove the text layer is intact.
 

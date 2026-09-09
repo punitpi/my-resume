@@ -249,16 +249,32 @@ Comfortable owning a system end to end, from Terraform module to production inci
 %-------------------------------------------------------------------------------
 % CERTIFICATIONS & AWARDS
 %-------------------------------------------------------------------------------
+% cventries, not cvhonors: cvhonors puts the date in a narrow fixed-width
+% column on the LEFT, which both wraps a date range and reads inconsistently
+% next to Experience, Projects and Education - all of which are cventries with
+% the date on the right. Same argument order as those: #1 = the credential
+% (small caps, line 2), #2 = the issuer (bold, line 1).
 \cvsection{Certifications \& Awards}
-\begin{cvhonors}
+\begin{cventries}
+
   % Issued Dec 2022, lapsed Dec 2025. Shown with the expiry rather than
   % dropped: passing the exam is still evidence, and an undated or
   % present-tense claim would be contradicted by a Credly check.
-  % The date column in cvhonors was widened to 2.6cm in awesome-cv.cls to fit
-  % this range; upstream's 1.5cm only fits a single year.
-  \cvhonor{AWS Certified Solutions Architect -- Associate \textnormal{\textit{(expired)}}}{Amazon Web Services}{}{2022 -- 2025}
-  \cvhonor{Spot Award}{critical project delivered ahead of schedule, OneAdvanced}{}{2023}
-\end{cvhonors}
+  \cventry
+    {AWS Certified Solutions Architect -- Associate \textnormal{\textit{(expired)}}}
+    {Amazon Web Services}
+    {}
+    {2022 -- 2025}
+    {}
+
+  \cventry
+    {Spot Award --- critical project delivered ahead of schedule}
+    {OneAdvanced}
+    {}
+    {2023}
+    {}
+
+\end{cventries}
 
 %-------------------------------------------------------------------------------
 % LANGUAGES
