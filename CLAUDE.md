@@ -129,7 +129,10 @@ the live site. Then run `verify-resume-build` on the CI PDF.
   2mm or above when tightening for page-fit.
 - **`cvhonors`** (3-column: date | title | location) looks visually disconnected next to a
   `cventries` table (2-column) in the *same* section. It is fine as its own section — that is how
-  "Certifications & Awards" is done.
+  "Certifications & Awards" is done. Its date column was **locally widened 1.5cm -> 2.6cm** (with
+  the middle column narrowed by the same amount so the three still sum to `\textwidth`) to fit a
+  date *range* like "2022 - 2025". Upstream's 1.5cm fits one year only: a range wraps to two
+  lines, and `\mbox`-ing it instead makes it overflow the column and collide with the title.
 - ATS verification that actually matters: `pdftotext -raw file.pdf - | grep -oE 'punitpi|ppuneeth|cert-manager'`
   — a clean visual render does not prove the text layer is intact.
 

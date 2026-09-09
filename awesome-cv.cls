@@ -819,7 +819,12 @@
   \begin{center}
     \setlength\tabcolsep{0pt}
     \setlength{\extrarowheight}{0pt}
-    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} C{1.5cm} L{\textwidth - 4.0cm} R{2.5cm}}
+    % LOCAL PATCH: date column widened 1.5cm -> 2.6cm (and the middle column
+    % narrowed by the same 1.1cm, so the three still sum to \textwidth) to fit
+    % a date RANGE like "2022 - 2025". At 1.5cm upstream's width only fits a
+    % single year: a range either wraps onto two lines or, if boxed, overflows
+    % the column and collides with the title next to it.
+    \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} C{2.6cm} L{\textwidth - 5.1cm} R{2.5cm}}
 }{%
     \end{tabular*}
   \end{center}
