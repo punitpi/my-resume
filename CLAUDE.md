@@ -34,8 +34,10 @@ don't duplicate those steps here.
   current resume.
 - `private.example.tex` — template for the git-ignored `private.tex` (phone number only). Only
   read when `\privatebuild` is defined on the command line (see Commands). Never commit
-  `private.tex` or `resume-private.pdf`: the repo and the release are public. See "Private
-  build" below.
+  `private.tex` or `resume-private.pdf`: this repo, its release, AND the private mirror's
+  release are all reachable from a link in this repo's own README (see the badge note below) —
+  there is no tier of this project's outputs that treats a phone number as safe to check in.
+  See "Private build" below.
 - `awesome-cv.cls` — vendored + locally patched Awesome-CV class (LPPL); `LICENCE-awesome-cv.txt`
   is its license. Credited in README, not in file names.
 - `fonts/` — vendored Source Sans 3 OTF weights (SIL OFL, `fonts/LICENSE-SourceSans3.txt`),
@@ -97,6 +99,12 @@ Invariants — do not break these:
   workspace.
 - Verified locally on 2026-09-09 by running the exact CI argument vector: the private PDF
   contains the phone number and the public PDF does not.
+- **This repo's own README links to the private release** (a "private copy — signed-in only"
+  badge, added deliberately with the user's explicit sign-off on the tradeoff). The download
+  itself stays gated by GitHub's own auth on the private repo — verified the link 404s
+  unauthenticated and succeeds via `gh` — but the badge does make `my-resume-private`'s existence
+  and its asset's filename visible to anyone browsing this public repo. That's an accepted
+  tradeoff, not an oversight; don't "fix" it by removing the badge without asking first.
 
 `latex-action` gotcha: `args` is **word-split on spaces**, and `latexmk_use_xelatex: true`
 appends `-xelatex` afterwards. So every flag in `args` must be space-free (hence
