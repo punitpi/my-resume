@@ -1,135 +1,257 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
 %==============================================================================
-% Puneeth Prakash - Resume
+% Puneeth Prakash - Resume (primary; built by CI)
 % Engine: XeLaTeX (required - fontspec)
-% Build:  latexmk -xelatex resume.tex
+% Build:  latexmk -xelatex resume.tex   ->  resume.pdf (CI renames it to Puneeth-Prakash-Resume.pdf)
 %
-% ATS notes: single column, no tables/tikz/images, plain-text headings,
-% selectable hyperlinks. Do not introduce multi-column layout or graphics -
-% applicant tracking systems extract text linearly and will scramble it.
+% Private build (adds phone + work-permit line from the git-ignored private.tex;
+% see private.example.tex):
+%   latexmk -xelatex -usepretex='\def\privatebuild{}' \
+%           -jobname=resume-private resume.tex
 %
-% Font: intentionally NO \setmainfont. XeLaTeX falls back to Latin Modern,
-% which is always present and needs no fontconfig lookup. Naming a family
-% (even TeX Gyre) can fail in the CI container's Alpine image.
+% Class: awesome-cv.cls (vendored from posquit0/Awesome-CV, LPPL
+% v1.3c, with local font-declaration modifications - see the header comment
+% in that file for what changed and why).
+%
+% Fonts: fonts/*.otf (Source Sans 3, SIL OFL 1.1, see
+% fonts/LICENSE-SourceSans3.txt). Referenced by explicit file path, not by
+% family name, so no fontconfig lookup is required in the CI container.
 %==============================================================================
-\documentclass[a4paper,10pt]{article}
+\documentclass[11pt, a4paper]{awesome-cv}
 
-\usepackage{fontspec}
-\usepackage[margin=0.5in,top=0.4in,bottom=0.4in]{geometry}
-\usepackage{titlesec}
-\usepackage{enumitem}
-\usepackage[hidelinks]{hyperref}
+% Emit /ActualText for every character run. Without this, xdvipdfmx builds the
+% ToUnicode map from the font's cmap and Source Sans 3 maps U+002D, U+2010 and
+% U+2011 to the same glyph, so every hyphen extracted as U+2011 ("cert‑manager")
+% and small-caps text extracted with dotless i ("ENGiNEER") - verified with
+% pdftotext on the CI-built PDF. With this set, both extract as plain ASCII.
+\XeTeXgenerateactualtext=1
 
-\hypersetup{
-  pdftitle={Puneeth Prakash - Resume},
-  pdfauthor={Puneeth Prakash},
-  pdfsubject={DevSecOps Engineer / Software Engineer},
-  pdfcreator={XeLaTeX}
-}
+\geometry{left=1.1cm, top=0.4cm, right=1.1cm, bottom=0.6cm, footskip=.3cm}
 
-% Suppress page numbering - single page document
-\pagestyle{empty}
+\colorlet{awesome}{awesome-skyblue}
+\setbool{acvSectionColorHighlight}{true}
+\renewcommand{\acvHeaderSocialSep}{\quad\textbar\quad}
 
-% Section headings: plain uppercase text with a horizontal rule beneath
-\titleformat{\section}
-  {\large\bfseries\scshape}
-  {}{0em}
-  {}[\vspace{-0.45em}\rule{\textwidth}{0.5pt}]
-\titlespacing*{\section}{0pt}{0.5em}{0.25em}
+% Tightened from the class defaults (3mm / 2.5mm). Content-top-skip is paired
+% with a fixed -3mm/-2mm offset at each call site in the class, so going
+% much below ~2mm nets a negative space large enough to pull paragraph
+% text up into the section-title line above it - keep this at 2mm or more.
+\renewcommand{\acvSectionTopSkip}{1.2mm}
+\renewcommand{\acvSectionContentTopSkip}{2mm}
 
-% Tight bullet lists
-\setlist[itemize]{
-  leftmargin=1.2em,
-  itemsep=0.08em,
-  parsep=0pt,
-  topsep=0.15em,
-  partopsep=0pt
-}
+% Header name is 32pt by default; the photo (1.3cm circle) plus that name
+% size leaves excess top whitespace. Trim both name lines by 1pt.
+\renewcommand*{\headerfirstnamestyle}[1]{{\fontsize{31pt}{1em}\headerfontlight\color{graytext} #1}}
+\renewcommand*{\headerlastnamestyle}[1]{{\fontsize{31pt}{1em}\headerfont\bfseries\color{text} #1}}
 
-% Experience entry: {Role}{Dates}{Company}{Location}
-\newcommand{\role}[4]{%
-  \vspace{0.22em}%
-  \noindent\textbf{#1}\hfill\textbf{#2}\par
-  \noindent\textit{#3}\hfill\textit{#4}\par
-  \vspace{-0.3em}%
-}
+%-------------------------------------------------------------------------------
+% PERSONAL INFORMATION
+%-------------------------------------------------------------------------------
+% Same headshot used on typedbyme.puneeth.io (assets/images/author/puneeth.png).
+\photo[circle,edge,right]{./images/puneeth}
+\name{Puneeth}{Prakash}
+\position{DevSecOps Engineer{\enskip\cdotp\enskip}Platform Engineer}
+\address{Bregenz, Vorarlberg, Austria}
 
-% Project entry: {Name}{Tech}{Description}
-\newcommand{\project}[3]{%
-  \item \textbf{#1} \textbar{} \textit{#2} --- #3
-}
+\email{contact@puneeth.io}
+\homepage{typedbyme.puneeth.io}
+\github{punitpi}
+\linkedin{ppuneeth}
 
+% Personal data that must not land in the public, auto-published PDF (phone,
+% work-permit status) lives in the git-ignored private.tex and is only pulled
+% in when \privatebuild is defined on the command line (see header comment).
+\ifdefined\privatebuild
+  \InputIfFileExists{private.tex}{}{%
+    \ClassError{resume}{private build requested but private.tex not found}{Copy private.example.tex to private.tex and fill it in.}}
+\fi
+
+%-------------------------------------------------------------------------------
 \begin{document}
 
-%------------------------------------------------------------------ HEADER
-\begin{center}
-  {\huge\bfseries Puneeth Prakash}\\[0.28em]
-  {\large DevSecOps Engineer \textbar{} Software Engineer}\\[0.3em]
-  Bregenz, Vorarlberg, Austria \textbullet{}
-  \href{mailto:contact@puneeth.io}{contact@puneeth.io} \textbullet{}
-  \href{https://linkedin.com/in/ppuneeth}{linkedin.com/in/ppuneeth} \textbullet{}
-  \href{https://github.com/punitpi}{github.com/punitpi} \textbullet{}
-  \href{https://typedbyme.puneeth.io}{typedbyme.puneeth.io}
-\end{center}
+\makecvheader[C]
 
-%------------------------------------------------------------------ SUMMARY
-\section{Summary}
-Software engineer with 8+ years of experience across DevSecOps, cloud-native architecture,
-and microservices. Currently building secure, observable engineering systems at OMICRON
-electronics. Works across C\#, Node.js, AWS, and Azure --- automating CI/CD workflows,
-hardening pipelines, and designing APIs and infrastructure that scale.
+\makecvfooter
+  {\today}
+  {Puneeth Prakash~~~\textperiodcentered~~~R\'esum\'e}
+  {\thepage}
 
-%------------------------------------------------------------------ SKILLS
-\section{Technical Skills}
-\begin{itemize}[leftmargin=0em,label={}]
-  \item \textbf{Languages:} C\#, JavaScript (Node.js), Python, Bash, SQL, YAML
-  \item \textbf{Cloud \& IaC:} AWS (EKS, Lambda, Fargate ECS, API Gateway, S3, DynamoDB), Azure (AKS, WebJobs), Terraform, CloudFormation
-  \item \textbf{DevSecOps \& CI/CD:} GitHub Actions, Jenkins, Harness, Ansible, SonarQube, Black Duck, Docker, Kubernetes, Helm
-  \item \textbf{Backend \& Data:} .NET, Express, Flask, React, Keycloak (OAuth2), Microsoft Graph API, MSSQL, MySQL, MongoDB, Redis
-\end{itemize}
+%-------------------------------------------------------------------------------
+% SUMMARY
+%-------------------------------------------------------------------------------
+\cvsection{Summary}\par
+\begin{cvparagraph}
+DevSecOps and platform engineer with 9+ years across cloud infrastructure, Kubernetes, CI/CD, and
+backend services on Azure and AWS. Builds the platform layer --- observability, infrastructure as
+code, hardened delivery pipelines --- and has shipped the Node.js and .NET services that run on it.
+AWS Certified Solutions Architect -- Associate; based in Vorarlberg, Austria.
+\end{cvparagraph}
 
-%------------------------------------------------------------------ EXPERIENCE
-\section{Experience}
+%-------------------------------------------------------------------------------
+% SKILLS
+%-------------------------------------------------------------------------------
+\cvsection{Technical Skills}
+\begin{cvskills}
+  \cvskill{Cloud \& IaC}{Azure (AKS, Key Vault, App Service, WebJobs), AWS (EKS, ECS Fargate, Lambda, API Gateway, DynamoDB, S3, SQS/SNS), Terraform, CloudFormation}
+  \cvskill{Kubernetes \& Observability}{Kubernetes, Helm, Docker, Grafana LGTM stack (Loki, Grafana, Tempo, Mimir), cert-manager, ingress-nginx, Traefik, Inlets Pro}
+  \cvskill{DevSecOps \& CI/CD}{GitHub Actions, Jenkins, Harness, Ansible, SonarQube, Black Duck, Keycloak (OAuth2), Tailscale, Authentik}
+  \cvskill{Languages \& Backend}{C\# / .NET, JavaScript / Node.js (Express), Python (Flask), Bash, SQL, HCL, React, Microsoft Graph API, MSSQL, MySQL, MongoDB, Redis}
+\end{cvskills}
 
-\role{DevSecOps Engineer / Software Engineer}{Dec 2025 -- Present}{OMICRON electronics}{Klaus, Austria}
-\begin{itemize}
-  \item Designed and deployed a full observability platform on Azure Kubernetes Service (AKS) using the LGTM stack (Loki, Grafana, Tempo, Mimir).
-  \item Built Azure infrastructure from scratch with Terraform, establishing reproducible environment provisioning.
-  \item Packaged observability components into a custom umbrella Helm chart for repeatable, versioned deployments.
-  \item Apply DevSecOps practices across cloud infrastructure security and CI/CD pipeline hardening.
-\end{itemize}
+%-------------------------------------------------------------------------------
+% EXPERIENCE
+%-------------------------------------------------------------------------------
+\cvsection{Experience}
+\begin{cventries}
 
-\role{Senior Software Engineer}{Feb 2021 -- Oct 2025}{OneAdvanced}{Bengaluru, India}
-\begin{itemize}
-  \item Architected cloud-native microservices using Node.js, AWS Lambda, and Kubernetes (EKS), deploying and maintaining production clusters.
-  \item Built a secure middleware microservice on AWS Fargate ECS with OAuth2 authentication via Keycloak.
-  \item Implemented end-to-end CI/CD pipelines using GitHub Actions, Harness, CloudFormation, and Terraform; designed reusable .NET Worker Services and Azure WebJobs for event-driven integrations.
-  \item Resolved penetration-testing vulnerabilities and drove \$1,000+ monthly AWS cost savings through resource optimization.
-\end{itemize}
+  \cventry
+    {DevSecOps Engineer / Software Engineer}
+    {OMICRON electronics}
+    {Klaus, Austria}
+    {Dec 2025 -- Present}
+    {
+      \begin{cvitems}
+        \item {Designed and deployed an observability platform on Azure Kubernetes Service (AKS) with the Grafana LGTM stack (Loki, Grafana, Tempo, Mimir), unifying metrics, logs, traces, and alerting.}
+        \item {Provisioned the underlying Azure infrastructure from scratch with modular Terraform, making every environment reproducible from code.}
+        \item {Packaged the whole stack into a custom umbrella Helm chart for repeatable, versioned deployments.}
+        \item {Currently applying DevSecOps practices across the platform: cloud infrastructure security, vulnerability management, and CI/CD pipeline hardening.}
+      \end{cvitems}
+    }
 
-\role{Software Engineer}{Mar 2018 -- Feb 2021}{OneAdvanced}{Bengaluru, India}
-\begin{itemize}
-  \item Built a serverless customer portal on AWS Lambda, API Gateway, and S3, contributing React front-end components.
-  \item Optimized SQL stored procedures for a 50\% improvement in query performance; automated deployments via Jenkins CI/CD pipelines.
-\end{itemize}
+  \cventry
+    {Senior Software Engineer}
+    {OneAdvanced}
+    {Bengaluru, India}
+    {Feb 2021 -- Oct 2025}
+    {
+      \begin{cvitems}
+        \item {Built a secure middleware microservice on AWS ECS Fargate (Node.js, Lambda, DynamoDB) with OAuth2 authentication via Keycloak, handling 100K+ transactions a day at 99.9\% uptime.}
+        \item {Deployed and operated production Kubernetes clusters on AWS EKS, running Inlets Pro as a reverse-proxy exit server with cert-manager TLS and zero-touch deployment.}
+        \item {Implemented end-to-end CI/CD on GitHub Actions and Harness with infrastructure defined in CloudFormation and Terraform, removing about 80\% of manual release work.}
+        \item {Designed reusable .NET Worker Service templates for event-driven backends (logging, encryption, database access) that cut duplicated code by 60\% across projects; built Azure WebJobs webhook endpoints for real-time integration with Microsoft services.}
+        \item {Fixed penetration-test and SonarQube findings across services and cut AWS spend by \$1,000+ per month through right-sizing, reserved instances, and automated shutdown of idle resources.}
+        \item {Ran internal training sessions on AWS and DevOps practices for the engineering team.}
+      \end{cvitems}
+    }
 
-\role{Test Engineer}{Mar 2017 -- Nov 2017}{Samsung R\&D Institute India}{Bengaluru, India}
-\begin{itemize}
-  \item Authored and executed 600+ test cases for Project Bixby; managed test server deployments and analyzed Android crash reports via ADB/DDMS.
-\end{itemize}
+  \cventry
+    {Software Engineer}
+    {OneAdvanced}
+    {Bengaluru, India}
+    {Mar 2018 -- Feb 2021}
+    {
+      \begin{cvitems}
+        \item {Built a .NET WinForms installer that automated software installation and database updates, cutting setup time from 1 hour to 5 minutes.}
+        \item {Co-developed a serverless customer portal on AWS Lambda, API Gateway, and S3, including React front-end components.}
+        \item {Rewrote critical SQL stored procedures for a 50\% query-performance gain; automated builds and deployments with Jenkins.}
+      \end{cvitems}
+    }
 
-%------------------------------------------------------------------ PROJECTS
-\section{Projects}
-\begin{itemize}
-  \project{LGTM Observability Stack}{AKS, Terraform, Helm}{Production-grade observability platform on Azure Kubernetes Service, provisioned with Terraform and deployed via a custom umbrella Helm chart.}
-  \project{Homelab Infrastructure}{Raspberry Pi, Traefik, Authentik, Tailscale}{Infrastructure-as-code homelab with SSO, reverse proxy, mesh networking, and automated Restic backups.}
-  \project{Spotify Now Playing API}{Cloudflare Workers, OAuth2}{Lightweight proxy for Spotify's Currently Playing API with automatic OAuth token refresh.}
-  \project{TypedByMe Portfolio}{Hugo, GitHub Actions}{Personal portfolio and technical blog with automated static-site builds and continuous deployment.}
-\end{itemize}
+  \cventry
+    {Test Engineer}
+    {Samsung R\&D Institute India}
+    {Bengaluru, India}
+    {Mar 2017 -- Nov 2017}
+    {
+      \begin{cvitems}
+        \item {Authored and executed 600+ functional, integration, performance, and regression test cases for Project Bixby; managed test-server deployments and analyzed Android crash logs with ADB/DDMS.}
+      \end{cvitems}
+    }
 
-%------------------------------------------------------------------ EDUCATION
-\section{Education \& Certification}
-\noindent\textbf{B.E., Computer Science and Engineering}\hfill\textbf{2013 -- 2017}\par
-\noindent\textit{Visvesvaraya Technological University}\hfill\textit{India}\par
-\noindent AWS Certified Solutions Architect -- Associate (2023)
+\end{cventries}
 
+%-------------------------------------------------------------------------------
+% PROJECTS
+%-------------------------------------------------------------------------------
+\cvsection{Projects}
+\begin{cventries}
+
+  \cventry
+    {Raspberry Pi, Ansible, Docker, Tailscale, Traefik, Authentik, Restic}
+    {Homelab Infrastructure \textnormal{\textcolor{graytext}{\small github.com/punitpi/homelab}}}
+    {}
+    {2024 -- Present}
+    {
+      \begin{cvitems}
+        \item {Four-node, infrastructure-as-code homelab: a cloud edge proxy (Traefik) reaches Raspberry Pi nodes over a Tailscale mesh with no ports exposed to the internet; Authentik SSO, a standby node for failover, and nightly Restic backups to Backblaze B2 with one-command restore.}
+        \item {Every service (AdGuard Home DNS, Uptime Kuma monitoring, FreshRSS, code-server, and more) runs as an Ansible-deployed Docker Compose stack, so the whole setup is reproducible and version-controlled.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Terraform, Azure}
+    {Azure Terraform Modules \textnormal{\textcolor{graytext}{\small github.com/punitpi/tf-azure-template}}}
+    {}
+    {2025}
+    {
+      \begin{cvitems}
+        \item {Reusable, per-environment Terraform modules for resource groups, virtual networks, storage, Key Vault, and App Service, with a remote state backend.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Hugo, GitHub Actions, LaTeX}
+    {TypedByMe Portfolio \textnormal{\textcolor{graytext}{\small typedbyme.puneeth.io}}}
+    {}
+    {2024 -- Present}
+    {
+      \begin{cvitems}
+        \item {Personal site and technical blog; this résumé is built from LaTeX in CI, published as a GitHub Release, and synced into the site on every push.}
+      \end{cvitems}
+    }
+
+  \cventry
+    {Cloudflare Workers, Node.js, OAuth2}
+    {Spotify Now Playing API \textnormal{\textcolor{graytext}{\small github.com/punitpi/spotify-now-playing}}}
+    {}
+    {2024}
+    {
+      \begin{cvitems}
+        \item {Lightweight proxy for Spotify's Currently Playing API with automatic OAuth token refresh, CORS, and edge caching; deployable to Workers, Docker, or Node.}
+      \end{cvitems}
+    }
+
+\end{cventries}
+
+%-------------------------------------------------------------------------------
+% EDUCATION & CERTIFICATION
+%-------------------------------------------------------------------------------
+\cvsection{Education}
+\begin{cventries}
+
+  \cventry
+    {B.E., Computer Science and Engineering}
+    {Visvesvaraya Technological University}
+    {India}
+    {2013 -- 2017}
+    {}
+
+\end{cventries}
+
+%-------------------------------------------------------------------------------
+% CERTIFICATIONS & AWARDS
+%-------------------------------------------------------------------------------
+\cvsection{Certifications \& Awards}
+\begin{cvhonors}
+  \cvhonor{AWS Certified Solutions Architect -- Associate}{Amazon Web Services}{}{2023}
+  \cvhonor{Spot Award}{critical project delivered ahead of schedule, OneAdvanced}{}{2023}
+\end{cvhonors}
+
+%-------------------------------------------------------------------------------
+% LANGUAGES (+ WORK AUTHORIZATION in the private build)
+%-------------------------------------------------------------------------------
+\ifdefined\workpermit
+  \cvsection{Languages \& Work Authorization}
+\else
+  \cvsection{Languages}
+\fi
+\begin{cvskills}
+  \cvskill{Languages}{English (C1), German (A1, actively learning), Kannada (native)}
+  \ifdefined\workpermit
+    \cvskill{Work authorization}{\workpermit}
+  \fi
+\end{cvskills}
+
+%-------------------------------------------------------------------------------
 \end{document}

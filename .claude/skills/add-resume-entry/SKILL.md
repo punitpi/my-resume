@@ -1,10 +1,10 @@
 ---
 name: add-resume-entry
-description: Add a new job, project, or education/certification entry to resume-awesome.tex using the correct cventry argument order for that section, avoiding the bold/small-caps swap that's easy to get backwards.
+description: Add a new job, project, education, certification, or award entry to resume.tex using the correct cventry argument order for that section, avoiding the bold/small-caps swap that's easy to get backwards.
 disable-model-invocation: true
 ---
 
-Adds an entry to `resume-awesome.tex`. This is a deliberate content edit — only run when the
+Adds an entry to `resume.tex`. This is a deliberate content edit — only run when the
 user explicitly asks to add something, never proactively.
 
 ## The trap this skill exists to avoid
@@ -45,25 +45,30 @@ had to be fixed in a follow-up commit. Always check which field should be visual
     }
 ```
 
-**Education / Certification** (institution/issuer prominent — issuer is `#2`, credential is `#1`):
+**Education** (institution prominent — institution is `#2`, degree is `#1`):
 ```latex
   \cventry
-    {<Degree or Certification Name>}
-    {<Institution or Issuing Body>}
-    {<Location, or blank for a cert>}
-    {<Date or Date Range>}
+    {<Degree>}
+    {<Institution>}
+    {<Location>}
+    {<Date Range>}
     {}
 ```
-Give a certification its own `\cventry` in the same `cventries` block as education — don't nest
-it as a `cvitems` bullet under the degree entry, which visually attaches it to that specific
-degree and is misleading for an unrelated professional credential (hit this exact issue before).
+
+**Certifications & Awards** live in their own `cvhonors` block (date | title, issuer), not in
+the Education `cventries` — a cert is not attached to a degree, and a 3-column `cvhonors` row
+next to a 2-column `cventries` table in the *same* section looks disconnected (see CLAUDE.md):
+```latex
+  \cvhonor{<Certification or Award Name>}{<Issuer, or short context>}{}{<Year>}
+```
 
 ## After adding an entry
 
 1. Insert it inside the relevant `\begin{cventries} ... \end{cventries}` block in the right
    section, keeping entries in reverse-chronological order (most recent first) unless the user
    says otherwise.
-2. Run the `verify-resume-build` skill to confirm: still 1 page (a new entry may push it to 2 —
-   see CLAUDE.md's page-fit trim order: tighten spacing first, cut content last, and ask the user
-   before dropping anything), correct field prominence in the rendered preview, and ATS text
-   extraction still includes all expected content.
+2. Build locally (see CLAUDE.md "Local build") and check: still 2 pages with no section heading
+   stranded at the bottom of page 1 (a `cventry` is a `tabular*` and cannot break across pages,
+   so a longer entry can jump to page 2 and leave its heading behind), correct field prominence
+   in the rendered preview, and ATS text extraction still includes all expected content. Then
+   push and run `verify-resume-build` for the CI-built PDF.

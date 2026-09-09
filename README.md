@@ -1,29 +1,38 @@
 # my-resume
 
 [![Build and Sync Resume](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml/badge.svg)](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml)
-[![Download PDF](https://img.shields.io/badge/download-resume--awesome.pdf-blue)](https://github.com/punitpi/my-resume/releases/latest/download/resume-awesome.pdf)
+[![Download PDF](https://img.shields.io/badge/download-Puneeth--Prakash--Resume.pdf-blue)](https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf)
 
 ATS-friendly LaTeX resume, single source of truth for [typedbyme.puneeth.io](https://typedbyme.puneeth.io).
 
 Two variants live in this repo:
-- **`resume-awesome.tex`** — the primary resume (Awesome-CV template, with photo). Every push on
-  `main` is compiled with XeLaTeX, published as a workflow artifact and as a rolling GitHub
-  Release (tag `latest`), and copied into the portfolio repository so the live site's resume link
-  always serves the current PDF.
-- **`resume.tex`** — the original single-column template, kept in the repo as a backup. Stable and
-  not actively changing, so it is **not** built automatically on push (see "Local development"
-  below to build it, or run the workflow manually with `root_file: resume.tex`).
+- **`resume.tex`** — the primary resume (two pages, with photo; built on the
+  [Awesome-CV](https://github.com/posquit0/Awesome-CV) class, see Credits). Every push on `main`
+  is compiled with XeLaTeX, published as `Puneeth-Prakash-Resume.pdf` (workflow artifact and
+  rolling GitHub Release, tag `latest`), and copied into the portfolio repository so the live
+  site's resume link always serves the current PDF.
+- **`resume-plain.tex`** — the original single-column template, kept in the repo as a backup.
+  Stable and not actively changing, so it is **not** built automatically on push (see "Local
+  development" below to build it, or run the workflow manually with `root_file: resume-plain.tex`).
+
+A **private build** adds a phone number and work-permit line that must not land in the public,
+auto-published PDF. Copy `private.example.tex` to `private.tex` (git-ignored), fill it in, and
+build with:
+
+```bash
+latexmk -xelatex -usepretex='\def\privatebuild{}' -jobname=resume-private resume.tex
+```
 
 ## How it works
 
 ```
-                push resume-awesome.tex
+                   push resume.tex
                           │
                           ▼
                 CI compiles with XeLaTeX
                           │
                           ▼
-                 resume-awesome.pdf
+             Puneeth-Prakash-Resume.pdf
                           │
             ┌─────────────┴─────────────┐
             ▼                           ▼
@@ -58,11 +67,11 @@ xelatex --version
 ### 2. Build the PDF
 
 ```bash
-latexmk -xelatex resume-awesome.tex   # primary resume
-latexmk -xelatex resume.tex           # backup, classic template
+latexmk -xelatex resume.tex           # primary resume -> resume.pdf
+latexmk -xelatex resume-plain.tex     # backup, classic template
 ```
 
-This produces `resume-awesome.pdf` / `resume.pdf` and leaves auxiliary files (`.aux`, `.log`,
+This produces `resume.pdf` / `resume-plain.pdf` and leaves auxiliary files (`.aux`, `.log`,
 etc.) alongside them — all git-ignored. To clean them up:
 
 ```bash
@@ -118,15 +127,22 @@ built PDF into the portfolio repo:
    New repository secret**:
    - **Name:** `PORTFOLIO_PAT`
    - **Value:** the token from step 2
-4. Push a change to `resume-awesome.tex` (or run the workflow manually via **Actions → Build and
+4. Push a change to `resume.tex` (or run the workflow manually via **Actions → Build and
    Sync Resume → Run workflow**) to verify the sync end-to-end.
 
 ## Outputs
 
 | Artifact | Location |
 |---|---|
-| Workflow artifact (per run) | Actions run summary → Artifacts → `resume-awesome-pdf` |
+| Workflow artifact (per run) | Actions run summary → Artifacts → `resume-pdf` |
 | Rolling release | [Releases → `latest`](https://github.com/punitpi/my-resume/releases/tag/latest) |
-| Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/resume-awesome.pdf` |
+| Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf` |
 | Live portfolio copy | `static/files/Resume.pdf` in [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme) |
-| Backup template | `resume.tex` — build locally, not built by CI |
+| Backup template | `resume-plain.tex` — build locally, not built by CI |
+
+## Credits
+
+- Layout: [Awesome-CV](https://github.com/posquit0/Awesome-CV) by Claud D. Park (LPPL 1.3c),
+  vendored as `awesome-cv.cls` with local font-loading patches — see `LICENCE-awesome-cv.txt`.
+- Font: [Source Sans 3](https://github.com/adobe-fonts/source-sans) (SIL OFL 1.1), vendored in
+  `fonts/` — see `fonts/LICENSE-SourceSans3.txt`.
