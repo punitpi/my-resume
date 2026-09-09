@@ -2,6 +2,7 @@
 
 [![Build and Sync Resume](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml/badge.svg)](https://github.com/punitpi/my-resume/actions/workflows/build-and-sync.yml)
 [![Download PDF](https://img.shields.io/badge/download-Puneeth--Prakash--Resume.pdf-blue)](https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf)
+[![Private copy (with phone)](https://img.shields.io/badge/private%20copy-signed--in%20only-lightgrey)](https://github.com/punitpi/my-resume-private/releases/latest/download/Puneeth-Prakash-Resume.pdf)
 
 ATS-friendly LaTeX resume, single source of truth for [typedbyme.puneeth.io](https://typedbyme.puneeth.io).
 
