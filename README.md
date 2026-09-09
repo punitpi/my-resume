@@ -15,33 +15,59 @@ Two variants live in this repo:
   Stable and not actively changing, so it is **not** built automatically on push (see "Local
   development" below to build it, or run the workflow manually with `root_file: resume-plain.tex`).
 
-A **private build** adds a phone number and work-permit line that must not land in the public,
-auto-published PDF. Copy `private.example.tex` to `private.tex` (git-ignored), fill it in, and
-build with:
+## Public and private builds
+
+The same `resume.tex` produces two PDFs. The difference is one file, `private.tex`, which holds a
+phone number and a work-permit line and must never reach a public surface.
+
+| | Public | Private |
+|---|---|---|
+| Personal data | none | phone + work permit |
+| Built by | CI, and locally | CI, and locally |
+| Published to | `latest` release, portfolio site | [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) only |
+| Source of the extra data | — | `private.tex` locally, `RESUME_PRIVATE_TEX` secret in CI |
+
+`resume.tex` only reads `private.tex` when `\privatebuild` is defined on the command line, so the
+public build cannot pick it up by accident. `private.tex` and `resume-private.pdf` are both
+git-ignored.
+
+**Locally**, copy `private.example.tex` to `private.tex`, fill in your real details, and build:
 
 ```bash
 latexmk -xelatex -usepretex='\def\privatebuild{}' -jobname=resume-private resume.tex
 ```
 
+**In CI**, the private build is reconstructed from the `RESUME_PRIVATE_TEX` secret, compiled, and
+pushed to the private mirror repo; `private.tex` is deleted from the runner immediately after the
+compile, and the private PDF is never uploaded as an artifact or attached to a release. See
+"GitHub Actions / Secrets setup" for the two secrets this needs.
+
+> **Why not just keep the private PDF as a workflow artifact?** On a public repository, workflow
+> artifacts and release assets are downloadable by anyone who can see the repo. There is no
+> private-artifact setting. The separate private repository is what provides the access control.
+
 ## How it works
 
 ```
-                   push resume.tex
-                          │
-                          ▼
-                CI compiles with XeLaTeX
-                          │
-                          ▼
-             Puneeth-Prakash-Resume.pdf
-                          │
-            ┌─────────────┴─────────────┐
-            ▼                           ▼
-  GitHub Release "latest"    static/files/Resume.pdf
-  (stable download URL)       in punitpi/typedbyme
-                                          │
-                                          ▼
-                           typedbyme's own Pages workflow
-                           rebuilds and redeploys the site
+                          push resume.tex
+                                 │
+                 ┌───────────────┴───────────────┐
+                 ▼                               ▼
+        public build (no                private build
+        private.tex present)          (RESUME_PRIVATE_TEX
+                 │                     -> private.tex, then
+                 │                      shredded on the runner)
+                 ▼                               │
+     Puneeth-Prakash-Resume.pdf                  ▼
+                 │                     Puneeth-Prakash-Resume.pdf
+      ┌──────────┴──────────┐              in punitpi/
+      ▼                     ▼             my-resume-private
+GitHub Release    static/files/Resume.pdf   (private repo)
+   "latest"        in punitpi/typedbyme
+(public download)            │
+                             ▼
+              typedbyme's own Pages workflow
+              rebuilds and redeploys the site
 ```
 
 The portfolio sync pushes with a Personal Access Token rather than the default `GITHUB_TOKEN`,
@@ -111,22 +137,46 @@ extension provides.
 
 ## GitHub Actions / Secrets setup
 
-The workflow (`.github/workflows/build-and-sync.yml`) needs one repository secret to sync the
-built PDF into the portfolio repo:
+The workflow (`.github/workflows/build-and-sync.yml`) needs three repository secrets, all set in
+**this** repo under **Settings → Secrets and variables → Actions → New repository secret**:
 
-1. In [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme), go to **Settings → Developer
-   settings → Personal access tokens → Fine-grained tokens** and generate a new token:
+| Secret | Purpose | Failure if missing |
+|---|---|---|
+| `PORTFOLIO_PAT` | push the public PDF into the portfolio repo | sync step fails; build + release still succeed |
+| `PRIVATE_REPO_PAT` | push the private PDF into the private mirror | run fails loudly (by design — a silent skip means a stale private copy) |
+| `RESUME_PRIVATE_TEX` | contents of `private.tex` for the CI private build | run fails loudly |
+
+### 1. `PORTFOLIO_PAT`
+
+1. Go to **Settings → Developer settings → Personal access tokens → Fine-grained tokens** and
+   generate a new token:
    - **Resource owner:** `punitpi`
    - **Repository access:** Only select repositories → `typedbyme`
    - **Permissions:** Repository → Contents → **Read and write**
    - Set an expiry (fine-grained tokens are capped at 1 year) — note the date, this is the
-     pipeline's one recurring maintenance item; it will silently stop syncing once the token
-     expires.
-2. Copy the generated token.
-3. In **this** repo (`punitpi/my-resume`), go to **Settings → Secrets and variables → Actions →
-   New repository secret**:
-   - **Name:** `PORTFOLIO_PAT`
-   - **Value:** the token from step 2
+     pipeline's recurring maintenance item; it will stop syncing once the token expires.
+2. Save it as the `PORTFOLIO_PAT` secret.
+
+### 2. `PRIVATE_REPO_PAT`
+
+Same procedure, but scoped to **`my-resume-private`** instead of `typedbyme`. Use a separate
+token rather than reusing `PORTFOLIO_PAT`: each token then reaches exactly one repository, so a
+leak of either one has a contained blast radius.
+
+### 3. `RESUME_PRIVATE_TEX`
+
+The entire contents of your local `private.tex`, pasted as the secret value. For example:
+
+```latex
+\mobile{+43 000 0000000}
+\newcommand{\workpermit}{EU Blue Card (Austria)}
+```
+
+Update this secret whenever your number or permit status changes — it is the CI copy of a file
+that is deliberately never committed.
+
+> The `Permissions` → `Contents` option only becomes selectable *after* choosing "Only select
+> repositories" and picking the target repo — easy to miss if you skip the repo picker.
 4. Push a change to `resume.tex` (or run the workflow manually via **Actions → Build and
    Sync Resume → Run workflow**) to verify the sync end-to-end.
 
@@ -138,6 +188,7 @@ built PDF into the portfolio repo:
 | Rolling release | [Releases → `latest`](https://github.com/punitpi/my-resume/releases/tag/latest) |
 | Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf` |
 | Live portfolio copy | `static/files/Resume.pdf` in [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme) |
+| **Private copy** (phone + permit) | `Puneeth-Prakash-Resume.pdf` in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) — private repo, not linked publicly |
 | Backup template | `resume-plain.tex` — build locally, not built by CI |
 
 ## Credits

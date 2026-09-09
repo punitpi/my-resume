@@ -34,7 +34,8 @@ don't duplicate those steps here.
   current resume.
 - `private.example.tex` — template for the git-ignored `private.tex` (phone number, work-permit
   line). Only read when `\privatebuild` is defined on the command line (see Commands). Never
-  commit `private.tex` or `resume-private.pdf`: the repo and the release are public.
+  commit `private.tex` or `resume-private.pdf`: the repo and the release are public. See
+  "Private build" below.
 - `awesome-cv.cls` — vendored + locally patched Awesome-CV class (LPPL); `LICENCE-awesome-cv.txt`
   is its license. Credited in README, not in file names.
 - `fonts/` — vendored Source Sans 3 OTF weights (SIL OFL, `fonts/LICENSE-SourceSans3.txt`),
@@ -52,6 +53,30 @@ don't duplicate those steps here.
   numbers, tool names, or outcomes that no source states — reviews and templates invent these.
 - Phone number and work-permit status stay out of the public PDF (private build only).
 - Languages: English (C1), German (A1, actively learning), Kannada (native). Permit: EU Blue Card.
+
+## Private build (personal data)
+
+Two PDFs come from one `resume.tex`. The public one has no personal data; the private one adds a
+phone number and work-permit line and goes **only** to the private repo `punitpi/my-resume-private`.
+
+Invariants — do not break these:
+
+- `resume.tex` reads `private.tex` only inside `\ifdefined\privatebuild`. Never inline a phone
+  number, permit status, or any other personal datum into a tracked file.
+- `private.tex` and `resume-private.pdf` are git-ignored. `git add -f` would override that; don't.
+- In CI the private variant is reconstructed from the `RESUME_PRIVATE_TEX` secret, and the
+  private PDF must never be uploaded as a workflow artifact or attached to a release. **On a
+  public repo, artifacts and release assets are downloadable by anyone who can see the repo** —
+  there is no private-artifact setting. Access control comes from the separate private repo.
+- Step order in the workflow matters: public compile and publish happen first (with no
+  `private.tex` on disk), then the private compile, then `rm -f private.tex`, then the sync. Two
+  `if: always()` cleanup steps remove `private.tex` and the private PDF from the workspace.
+- Verified locally on 2026-09-09 by running the exact CI argument vector: the private PDF
+  contains the phone and permit, the public PDF contains neither.
+
+`latex-action` gotcha: `args` is **word-split on spaces**, and `latexmk_use_xelatex: true`
+appends `-xelatex` afterwards. So every flag in `args` must be space-free (hence
+`-usepretex=\def\privatebuild{}`), and `-xelatex` must NOT be repeated there.
 
 ## Page count
 

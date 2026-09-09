@@ -34,7 +34,9 @@ jobs:
       - name: Checkout resume repo
         uses: actions/checkout@v7
 
-      - name: Compile resume.tex with XeLaTeX
+      # The public build runs FIRST and with no private.tex present, so the
+      # published PDF cannot contain personal data even if a later step fails.
+      - name: Compile resume.tex with XeLaTeX (public)
         uses: xu-cheng/latex-action@v4
         with:
           root_file: resume.tex
@@ -101,3 +103,82 @@ jobs:
           # a PAT (unlike the default GITHUB_TOKEN) does trigger downstream
           # workflows, which is what makes this chain reach the live site.
           git push "https://x-access-token:${PORTFOLIO_PAT}@github.com/punitpi/typedbyme.git" HEAD:main
+
+      # ---------------------------------------------------------------------
+      # Private variant. Contains the phone number and work-permit line, so it
+      # must never reach a public surface: no artifact upload, no release
+      # asset, no commit back to this repo. It goes only to the private
+      # my-resume-private repo.
+      #
+      # Ordering is deliberate: this block runs LAST, after the public PDF has
+      # been uploaded, released, and synced to the portfolio - so a failure
+      # here (expired PAT, missing secret) cannot stop the public resume from
+      # shipping. private.tex is written as late as possible and deleted
+      # immediately after the compile, before any other step can pick it up.
+      # ---------------------------------------------------------------------
+      - name: Write private.tex from secret
+        env:
+          RESUME_PRIVATE_TEX: ${{ secrets.RESUME_PRIVATE_TEX }}
+        run: |
+          set -euo pipefail
+          if [ -z "${RESUME_PRIVATE_TEX}" ]; then
+            echo "::error::RESUME_PRIVATE_TEX secret is not set. Add it (contents of private.tex) or remove the private-sync steps."
+            exit 1
+          fi
+          printf '%s\n' "${RESUME_PRIVATE_TEX}" > private.tex
+
+      - name: Compile private variant with XeLaTeX
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: resume.tex
+          latexmk_use_xelatex: true
+          # args is word-split on spaces by the action, then it appends
+          # -xelatex itself (because latexmk_use_xelatex is true) - so do NOT
+          # repeat -xelatex here. Every flag below must be space-free.
+          # -jobname keeps this output separate from the public resume.pdf,
+          # which at this point has already been renamed and published.
+          args: -interaction=nonstopmode -halt-on-error -file-line-error -usepretex=\def\privatebuild{} -jobname=Puneeth-Prakash-Resume-private
+
+      # Delete the secret material as soon as the compile is done. Everything
+      # after this point runs in a workspace with no personal data in it.
+      - name: Shred private.tex
+        if: always()
+        run: rm -f private.tex
+
+      - name: Sync private PDF into my-resume-private
+        env:
+          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${PRIVATE_REPO_PAT}" ]; then
+            echo "::error::PRIVATE_REPO_PAT secret is not set - the private resume copy would go stale."
+            exit 1
+          fi
+
+          test -f Puneeth-Prakash-Resume-private.pdf
+
+          git clone --depth 1 \
+            "https://x-access-token:${PRIVATE_REPO_PAT}@github.com/punitpi/my-resume-private.git" private-repo
+
+          cp Puneeth-Prakash-Resume-private.pdf private-repo/Puneeth-Prakash-Resume.pdf
+
+          cd private-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Puneeth-Prakash-Resume.pdf
+
+          if git diff --cached --quiet; then
+            echo "Private resume PDF unchanged - nothing to sync."
+            exit 0
+          fi
+
+          git commit -m "chore: sync private resume PDF from my-resume@${GITHUB_SHA}"
+          git push "https://x-access-token:${PRIVATE_REPO_PAT}@github.com/punitpi/my-resume-private.git" HEAD:main
+
+      # Belt and braces: the private PDF must not be left in the workspace for
+      # any future step added below to publish by accident. Both cleanup steps
+      # are if: always() so they run even when the compile or sync fails.
+      - name: Remove private PDF from workspace
+        if: always()
+        run: rm -f Puneeth-Prakash-Resume-private.pdf
