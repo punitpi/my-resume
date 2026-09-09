@@ -53,7 +53,18 @@
 \photo[circle,edge,right]{./images/puneeth}
 \name{Puneeth}{Prakash}
 \position{DevSecOps Engineer{\enskip\cdotp\enskip}Platform Engineer}
-\address{Bregenz, Vorarlberg, Austria}
+% Work authorization rides on the address line, immediately under the job
+% title, because in the DACH market it is a go/no-go filter a recruiter looks
+% for in the first few seconds. Set upright and in the accent colour so it
+% separates from the italic grey address rather than blending into it.
+%
+% Just the permit name - no "no sponsorship required" or similar gloss. An
+% Austrian EU Blue Card is tied to one employer (a new employer still files an
+% application), so any such claim would overstate it. The card name alone is
+% the fact; the recruiter knows what it means.
+\address{Bregenz, Vorarlberg, Austria
+  {\enskip\textbullet\enskip}
+  {\upshape\bfseries\color{awesome} EU Blue Card (Austria)}}
 
 \email{contact@puneeth.io}
 \homepage{typedbyme.puneeth.io}
@@ -63,7 +74,7 @@
 % The phone number must not land in the public, auto-published PDF, so it
 % lives in the git-ignored private.tex and is only pulled in when
 % \privatebuild is defined on the command line (see header comment).
-% Work authorization is public - see the Languages section at the end.
+% Work authorization is public - it is on the address line above.
 \ifdefined\privatebuild
   \InputIfFileExists{private.tex}{}{%
     \ClassError{resume}{private build requested but private.tex not found}{Copy private.example.tex to private.tex and fill it in.}}
@@ -241,17 +252,15 @@ AWS Certified Solutions Architect -- Associate; based in Vorarlberg, Austria.
 \end{cvhonors}
 
 %-------------------------------------------------------------------------------
-% LANGUAGES & WORK AUTHORIZATION
+% LANGUAGES
 %-------------------------------------------------------------------------------
-% Work authorization is deliberately public: in the DACH market it is a
-% go/no-go filter recruiters look for, and stating it up front avoids the
-% "do they need sponsorship?" question. Only the phone number is private
-% (see the \privatebuild block near the top of this file).
+% Work authorization is NOT repeated here - it sits on the address line in the
+% header, where a recruiter actually looks for it. Stating it twice in one
+% two-page document reads as padding.
 %-------------------------------------------------------------------------------
-\cvsection{Languages \& Work Authorization}
+\cvsection{Languages}
 \begin{cvskills}
   \cvskill{Languages}{English (C1), German (A1, actively learning), Kannada (native)}
-  \cvskill{Work authorization}{EU Blue Card (Austria) --- no sponsorship required}
 \end{cvskills}
 
 %-------------------------------------------------------------------------------
