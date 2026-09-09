@@ -105,7 +105,7 @@ jobs:
           git push "https://x-access-token:${PORTFOLIO_PAT}@github.com/punitpi/typedbyme.git" HEAD:main
 
       # ---------------------------------------------------------------------
-      # Private variant. Contains the phone number and work-permit line, so it
+      # Private variant. Contains the phone number, so it
       # must never reach a public surface: no artifact upload, no release
       # asset, no commit back to this repo. It goes only to the private
       # my-resume-private repo.

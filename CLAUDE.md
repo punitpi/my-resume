@@ -9,7 +9,7 @@ that exact path).
 ```bash
 export PATH=/usr/local/texlive/2026/bin/universal-darwin:$PATH   # TeX Live is installed but NOT on PATH
 latexmk -xelatex resume.tex                                       # primary resume -> resume.pdf
-latexmk -xelatex -usepretex='\def\privatebuild{}' -jobname=resume-private resume.tex   # + phone/permit
+latexmk -xelatex -usepretex='\def\privatebuild{}' -jobname=resume-private resume.tex   # + phone number
 latexmk -xelatex resume-plain.tex                                 # backup template
 latexmk -c                                                        # clean aux files
 ```
@@ -32,10 +32,10 @@ don't duplicate those steps here.
 - `resume-plain.tex` — backup single-column template. Not built by CI. Its content has NOT been
   kept in sync with `resume.tex` since the Sep 2026 rewrite; treat it as a layout fallback, not a
   current resume.
-- `private.example.tex` — template for the git-ignored `private.tex` (phone number, work-permit
-  line). Only read when `\privatebuild` is defined on the command line (see Commands). Never
-  commit `private.tex` or `resume-private.pdf`: the repo and the release are public. See
-  "Private build" below.
+- `private.example.tex` — template for the git-ignored `private.tex` (phone number only). Only
+  read when `\privatebuild` is defined on the command line (see Commands). Never commit
+  `private.tex` or `resume-private.pdf`: the repo and the release are public. See "Private
+  build" below.
 - `awesome-cv.cls` — vendored + locally patched Awesome-CV class (LPPL); `LICENCE-awesome-cv.txt`
   is its license. Credited in README, not in file names.
 - `fonts/` — vendored Source Sans 3 OTF weights (SIL OFL, `fonts/LICENSE-SourceSans3.txt`),
@@ -51,18 +51,21 @@ don't duplicate those steps here.
 - Every metric and claim must trace to a source the user confirmed (older resumes, the portfolio
   repo's `data/en/sections/*.yaml`, GitHub READMEs, or an explicit answer). Do not add scale
   numbers, tool names, or outcomes that no source states — reviews and templates invent these.
-- Phone number and work-permit status stay out of the public PDF (private build only).
+- The phone number is the ONLY private field; it stays out of the public PDF (private build
+  only). Work authorization is deliberately public — it is a DACH hiring filter, and the public
+  resume states "EU Blue Card (Austria) — no sponsorship required".
 - Languages: English (C1), German (A1, actively learning), Kannada (native). Permit: EU Blue Card.
 
 ## Private build (personal data)
 
 Two PDFs come from one `resume.tex`. The public one has no personal data; the private one adds a
-phone number and work-permit line and goes **only** to the private repo `punitpi/my-resume-private`.
+phone number and goes **only** to the private repo `punitpi/my-resume-private`.
 
 Invariants — do not break these:
 
 - `resume.tex` reads `private.tex` only inside `\ifdefined\privatebuild`. Never inline a phone
-  number, permit status, or any other personal datum into a tracked file.
+  number or other private datum into a tracked file. (Work authorization is not one — it is
+  public, in the Languages section of `resume.tex`.)
 - `private.tex` and `resume-private.pdf` are git-ignored. `git add -f` would override that; don't.
 - In CI the private variant is reconstructed from the `RESUME_PRIVATE_TEX` secret, and the
   private PDF must never be uploaded as a workflow artifact or attached to a release. **On a
@@ -72,7 +75,7 @@ Invariants — do not break these:
   `private.tex` on disk), then the private compile, then `rm -f private.tex`, then the sync. Two
   `if: always()` cleanup steps remove `private.tex` and the private PDF from the workspace.
 - Verified locally on 2026-09-09 by running the exact CI argument vector: the private PDF
-  contains the phone and permit, the public PDF contains neither.
+  contains the phone number and the public PDF does not.
 
 `latex-action` gotcha: `args` is **word-split on spaces**, and `latexmk_use_xelatex: true`
 appends `-xelatex` afterwards. So every flag in `args` must be space-free (hence

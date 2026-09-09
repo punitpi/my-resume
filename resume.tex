@@ -5,8 +5,9 @@
 % Engine: XeLaTeX (required - fontspec)
 % Build:  latexmk -xelatex resume.tex   ->  resume.pdf (CI renames it to Puneeth-Prakash-Resume.pdf)
 %
-% Private build (adds phone + work-permit line from the git-ignored private.tex;
-% see private.example.tex):
+% Private build (adds the phone number from the git-ignored private.tex; see
+% private.example.tex). Work authorization is NOT private - it is in the
+% public document below:
 %   latexmk -xelatex -usepretex='\def\privatebuild{}' \
 %           -jobname=resume-private resume.tex
 %
@@ -59,9 +60,10 @@
 \github{punitpi}
 \linkedin{ppuneeth}
 
-% Personal data that must not land in the public, auto-published PDF (phone,
-% work-permit status) lives in the git-ignored private.tex and is only pulled
-% in when \privatebuild is defined on the command line (see header comment).
+% The phone number must not land in the public, auto-published PDF, so it
+% lives in the git-ignored private.tex and is only pulled in when
+% \privatebuild is defined on the command line (see header comment).
+% Work authorization is public - see the Languages section at the end.
 \ifdefined\privatebuild
   \InputIfFileExists{private.tex}{}{%
     \ClassError{resume}{private build requested but private.tex not found}{Copy private.example.tex to private.tex and fill it in.}}
@@ -239,18 +241,17 @@ AWS Certified Solutions Architect -- Associate; based in Vorarlberg, Austria.
 \end{cvhonors}
 
 %-------------------------------------------------------------------------------
-% LANGUAGES (+ WORK AUTHORIZATION in the private build)
+% LANGUAGES & WORK AUTHORIZATION
 %-------------------------------------------------------------------------------
-\ifdefined\workpermit
-  \cvsection{Languages \& Work Authorization}
-\else
-  \cvsection{Languages}
-\fi
+% Work authorization is deliberately public: in the DACH market it is a
+% go/no-go filter recruiters look for, and stating it up front avoids the
+% "do they need sponsorship?" question. Only the phone number is private
+% (see the \privatebuild block near the top of this file).
+%-------------------------------------------------------------------------------
+\cvsection{Languages \& Work Authorization}
 \begin{cvskills}
   \cvskill{Languages}{English (C1), German (A1, actively learning), Kannada (native)}
-  \ifdefined\workpermit
-    \cvskill{Work authorization}{\workpermit}
-  \fi
+  \cvskill{Work authorization}{EU Blue Card (Austria) --- no sponsorship required}
 \end{cvskills}
 
 %-------------------------------------------------------------------------------

@@ -17,12 +17,16 @@ Two variants live in this repo:
 
 ## Public and private builds
 
-The same `resume.tex` produces two PDFs. The difference is one file, `private.tex`, which holds a
-phone number and a work-permit line and must never reach a public surface.
+The same `resume.tex` produces two PDFs. The difference is one file, `private.tex`, which holds
+the phone number and must never reach a public surface.
+
+Work authorization is **not** private — it is in the public resume. In the DACH market it is a
+go/no-go filter recruiters look for, so stating "EU Blue Card (Austria) — no sponsorship
+required" up front is the point.
 
 | | Public | Private |
 |---|---|---|
-| Personal data | none | phone + work permit |
+| Phone number | absent | present |
 | Built by | CI, and locally | CI, and locally |
 | Published to | `latest` release, portfolio site | [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) only |
 | Source of the extra data | — | `private.tex` locally, `RESUME_PRIVATE_TEX` secret in CI |
@@ -169,11 +173,10 @@ The entire contents of your local `private.tex`, pasted as the secret value. For
 
 ```latex
 \mobile{+43 000 0000000}
-\newcommand{\workpermit}{EU Blue Card (Austria)}
 ```
 
-Update this secret whenever your number or permit status changes — it is the CI copy of a file
-that is deliberately never committed.
+Update this secret whenever your number changes — it is the CI copy of a file that is
+deliberately never committed.
 
 > The `Permissions` → `Contents` option only becomes selectable *after* choosing "Only select
 > repositories" and picking the target repo — easy to miss if you skip the repo picker.
@@ -188,7 +191,7 @@ that is deliberately never committed.
 | Rolling release | [Releases → `latest`](https://github.com/punitpi/my-resume/releases/tag/latest) |
 | Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf` |
 | Live portfolio copy | `static/files/Resume.pdf` in [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme) |
-| **Private copy** (phone + permit) | `Puneeth-Prakash-Resume.pdf` in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) — private repo, not linked publicly |
+| **Private copy** (with phone number) | `Puneeth-Prakash-Resume.pdf` in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) — private repo, not linked publicly |
 | Backup template | `resume-plain.tex` — build locally, not built by CI |
 
 ## Credits
