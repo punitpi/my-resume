@@ -59,7 +59,8 @@ don't duplicate those steps here.
 ## Private build (personal data)
 
 Two PDFs come from one `resume.tex`. The public one has no personal data; the private one adds a
-phone number and goes **only** to the private repo `punitpi/my-resume-private`.
+phone number and goes **only** to a rolling release (tag `latest`) in the private repo
+`punitpi/my-resume-private`.
 
 Invariants — do not break these:
 
@@ -68,12 +69,22 @@ Invariants — do not break these:
   public, in the Languages section of `resume.tex`.)
 - `private.tex` and `resume-private.pdf` are git-ignored. `git add -f` would override that; don't.
 - In CI the private variant is reconstructed from the `RESUME_PRIVATE_TEX` secret, and the
-  private PDF must never be uploaded as a workflow artifact or attached to a release. **On a
-  public repo, artifacts and release assets are downloadable by anyone who can see the repo** —
-  there is no private-artifact setting. Access control comes from the separate private repo.
+  private PDF must **never** be uploaded as a workflow artifact or attached to a release **of
+  THIS repo (`my-resume`)** — on a *public* repo, artifacts and release assets are downloadable
+  by anyone who can see it, there is no private-artifact setting, and `my-resume` is public.
+  Publishing it as a release **in `my-resume-private`** instead is fine and is what happens: that
+  repo is itself private, so GitHub gates the download the same way it gated the old committed
+  file — access control comes from the destination repo's visibility, not from avoiding releases
+  as a mechanism.
+- The private release is published cross-repo via `softprops/action-gh-release`'s `repository` +
+  `token` inputs (not `GITHUB_TOKEN`, which can't write to another repo) using
+  `PRIVATE_REPO_PAT`. This replaced an earlier `git clone`/`commit`/`push` approach that committed
+  the PDF into `my-resume-private`'s tree — moved to a release so the link stays stable
+  (`.../releases/latest/download/...`) instead of the repo accumulating one commit per change.
 - Step order in the workflow matters: public compile and publish happen first (with no
-  `private.tex` on disk), then the private compile, then `rm -f private.tex`, then the sync. Two
-  `if: always()` cleanup steps remove `private.tex` and the private PDF from the workspace.
+  `private.tex` on disk), then the private compile, then `rm -f private.tex`, then the release
+  publish. Two `if: always()` cleanup steps remove `private.tex` and the private PDF from the
+  workspace.
 - Verified locally on 2026-09-09 by running the exact CI argument vector: the private PDF
   contains the phone number and the public PDF does not.
 

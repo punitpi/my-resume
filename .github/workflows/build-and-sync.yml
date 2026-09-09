@@ -145,36 +145,34 @@ jobs:
         if: always()
         run: rm -f private.tex
 
-      - name: Sync private PDF into my-resume-private
-        env:
-          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
+      - name: Check PRIVATE_REPO_PAT is set
         run: |
-          set -euo pipefail
-
           if [ -z "${PRIVATE_REPO_PAT}" ]; then
-            echo "::error::PRIVATE_REPO_PAT secret is not set - the private resume copy would go stale."
+            echo "::error::PRIVATE_REPO_PAT secret is not set - the private resume release would go stale."
             exit 1
           fi
+        env:
+          PRIVATE_REPO_PAT: ${{ secrets.PRIVATE_REPO_PAT }}
 
-          test -f Puneeth-Prakash-Resume-private.pdf
-
-          git clone --depth 1 \
-            "https://x-access-token:${PRIVATE_REPO_PAT}@github.com/punitpi/my-resume-private.git" private-repo
-
-          cp Puneeth-Prakash-Resume-private.pdf private-repo/Puneeth-Prakash-Resume.pdf
-
-          cd private-repo
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Puneeth-Prakash-Resume.pdf
-
-          if git diff --cached --quiet; then
-            echo "Private resume PDF unchanged - nothing to sync."
-            exit 0
-          fi
-
-          git commit -m "chore: sync private resume PDF from my-resume@${GITHUB_SHA}"
-          git push "https://x-access-token:${PRIVATE_REPO_PAT}@github.com/punitpi/my-resume-private.git" HEAD:main
+      # Published as a rolling release in the PRIVATE repo, the same pattern
+      # used for the public PDF above (tag "latest", overwrite_files true) -
+      # not committed into the repo tree. That gives a stable, permanent
+      # /releases/latest/download/... URL instead of a file whose git history
+      # accumulates one commit per resume change forever. `repository` +
+      # `token` (a cross-repo PAT, not GITHUB_TOKEN) is this action's
+      # documented way to publish to a different repo than the one the
+      # workflow runs in.
+      - name: Publish rolling release in my-resume-private
+        uses: softprops/action-gh-release@v3
+        with:
+          repository: punitpi/my-resume-private
+          token: ${{ secrets.PRIVATE_REPO_PAT }}
+          tag_name: latest
+          name: "Latest Private Resume"
+          body: "Automatically built from punitpi/my-resume@${{ github.sha }}. Includes the phone number - do not share this link."
+          prerelease: false
+          make_latest: true
+          files: Puneeth-Prakash-Resume-private.pdf
 
       # Belt and braces: the private PDF must not be left in the workspace for
       # any future step added below to publish by accident. Both cleanup steps

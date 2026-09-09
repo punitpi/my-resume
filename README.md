@@ -28,7 +28,7 @@ required" up front is the point.
 |---|---|---|
 | Phone number | absent | present |
 | Built by | CI, and locally | CI, and locally |
-| Published to | `latest` release, portfolio site | [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) only |
+| Published to | `latest` release, portfolio site | `latest` release in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) only |
 | Source of the extra data | — | `private.tex` locally, `RESUME_PRIVATE_TEX` secret in CI |
 
 `resume.tex` only reads `private.tex` when `\privatebuild` is defined on the command line, so the
@@ -42,13 +42,17 @@ latexmk -xelatex -usepretex='\def\privatebuild{}' -jobname=resume-private resume
 ```
 
 **In CI**, the private build is reconstructed from the `RESUME_PRIVATE_TEX` secret, compiled, and
-pushed to the private mirror repo; `private.tex` is deleted from the runner immediately after the
-compile, and the private PDF is never uploaded as an artifact or attached to a release. See
-"GitHub Actions / Secrets setup" for the two secrets this needs.
+published as a rolling release in the private mirror repo (cross-repo, via `PRIVATE_REPO_PAT`);
+`private.tex` is deleted from the runner immediately after the compile, and the private PDF is
+never uploaded as an artifact or attached to a release **of this repo**. See "GitHub Actions /
+Secrets setup" for the two secrets this needs.
 
-> **Why not just keep the private PDF as a workflow artifact?** On a public repository, workflow
-> artifacts and release assets are downloadable by anyone who can see the repo. There is no
-> private-artifact setting. The separate private repository is what provides the access control.
+> **Why not a workflow artifact or a release in *this* repo?** `my-resume` is public, and on a
+> public repository, workflow artifacts and release assets are downloadable by anyone who can see
+> the repo — there is no private-artifact setting. Publishing the private PDF as a release in the
+> *private* `my-resume-private` repo instead works fine, because that repo's own visibility is
+> what gates the download, the same way it gated the file when it lived directly in that repo's
+> tree.
 
 ## How it works
 
@@ -64,12 +68,12 @@ compile, and the private PDF is never uploaded as an artifact or attached to a r
                  ▼                               │
      Puneeth-Prakash-Resume.pdf                  ▼
                  │                     Puneeth-Prakash-Resume.pdf
-      ┌──────────┴──────────┐              in punitpi/
-      ▼                     ▼             my-resume-private
-GitHub Release    static/files/Resume.pdf   (private repo)
-   "latest"        in punitpi/typedbyme
-(public download)            │
-                             ▼
+      ┌──────────┴──────────┐          released (tag "latest")
+      ▼                     ▼               in punitpi/
+GitHub Release    static/files/Resume.pdf   my-resume-private
+   "latest"        in punitpi/typedbyme     (private repo, so
+(public download)            │            the download itself
+                             ▼               is access-gated)
               typedbyme's own Pages workflow
               rebuilds and redeploys the site
 ```
@@ -147,7 +151,7 @@ The workflow (`.github/workflows/build-and-sync.yml`) needs three repository sec
 | Secret | Purpose | Failure if missing |
 |---|---|---|
 | `PORTFOLIO_PAT` | push the public PDF into the portfolio repo | sync step fails; build + release still succeed |
-| `PRIVATE_REPO_PAT` | push the private PDF into the private mirror | run fails loudly (by design — a silent skip means a stale private copy) |
+| `PRIVATE_REPO_PAT` | publish the private PDF as a release in the private mirror | run fails loudly (by design — a silent skip means a stale private copy) |
 | `RESUME_PRIVATE_TEX` | contents of `private.tex` for the CI private build | run fails loudly |
 
 ### 1. `PORTFOLIO_PAT`
@@ -163,9 +167,11 @@ The workflow (`.github/workflows/build-and-sync.yml`) needs three repository sec
 
 ### 2. `PRIVATE_REPO_PAT`
 
-Same procedure, but scoped to **`my-resume-private`** instead of `typedbyme`. Use a separate
-token rather than reusing `PORTFOLIO_PAT`: each token then reaches exactly one repository, so a
-leak of either one has a contained blast radius.
+Same procedure, but scoped to **`my-resume-private`** instead of `typedbyme`, with the same
+**Contents → Read and write** permission (this also covers creating releases, which is how the
+private PDF is published — see "Outputs" below). Use a separate token rather than reusing
+`PORTFOLIO_PAT`: each token then reaches exactly one repository, so a leak of either one has a
+contained blast radius.
 
 ### 3. `RESUME_PRIVATE_TEX`
 
@@ -191,7 +197,7 @@ deliberately never committed.
 | Rolling release | [Releases → `latest`](https://github.com/punitpi/my-resume/releases/tag/latest) |
 | Stable download link | `https://github.com/punitpi/my-resume/releases/latest/download/Puneeth-Prakash-Resume.pdf` |
 | Live portfolio copy | `static/files/Resume.pdf` in [`punitpi/typedbyme`](https://github.com/punitpi/typedbyme) |
-| **Private copy** (with phone number) | `Puneeth-Prakash-Resume.pdf` in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) — private repo, not linked publicly |
+| **Private copy** (with phone number) | [`latest` release](https://github.com/punitpi/my-resume-private/releases/latest) in [`punitpi/my-resume-private`](https://github.com/punitpi/my-resume-private) — private repo, so the download link still requires being signed in as you |
 | Backup template | `resume-plain.tex` — build locally, not built by CI |
 
 ## Credits
